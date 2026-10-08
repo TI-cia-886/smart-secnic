@@ -1,0 +1,490 @@
+2026-10-07T12:13:42.438+08:00  INFO 20308 --- [smart-scenic] [main] com.ikun.Main                            : Starting Main using Java 25.0.3 with PID 20308 (A:\graduation_project\smart-scenic\target\classes started by 23600 in A:\graduation_project\smart-scenic)
+2026-10-07T12:13:42.444+08:00 DEBUG 20308 --- [smart-scenic] [main] com.ikun.Main                            : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-10-07T12:13:42.445+08:00  INFO 20308 --- [smart-scenic] [main] com.ikun.Main                            : The following 1 profile is active: "dev"
+2026-10-07T12:13:43.405+08:00  INFO 20308 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-10-07T12:13:43.407+08:00  INFO 20308 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-10-07T12:13:43.448+08:00  INFO 20308 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 26 ms. Found 0 Redis repository interfaces.
+2026-10-07T12:13:44.193+08:00  INFO 20308 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-07T12:13:44.208+08:00  INFO 20308 --- [smart-scenic] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-07T12:13:44.209+08:00  INFO 20308 --- [smart-scenic] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-10-07T12:13:44.278+08:00  INFO 20308 --- [smart-scenic] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-10-07T12:13:44.278+08:00  INFO 20308 --- [smart-scenic] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1786 ms
+2026-10-07T12:13:44.401+08:00  INFO 20308 --- [smart-scenic] [main] c.a.d.s.b.a.DruidDataSourceAutoConfigure : Init DruidDataSource
+2026-10-07T12:13:44.801+08:00  INFO 20308 --- [smart-scenic] [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2026-10-07T12:13:46.228+08:00  INFO 20308 --- [smart-scenic] [main] com.ikun.util.AesUtil                    : 敏感数据加密已启用：AES-256-GCM（密钥长度 256 bit）
+2026-10-07T12:13:46.838+08:00  INFO 20308 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-10-07T12:13:46.847+08:00  INFO 20308 --- [smart-scenic] [main] com.ikun.Main                            : Started Main in 4.847 seconds (process running for 7.017)
+2026-10-07T12:13:47.285+08:00  INFO 20308 --- [smart-scenic] [main] c.i.r.DataEncryptionMigrationRunner      : 敏感数据加密迁移完成：共加密 14 条明文手机号，并回填 SHA-256 摘要
+2026-10-07T12:14:16.634+08:00  INFO 20308 --- [smart-scenic] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-07T12:14:16.634+08:00  INFO 20308 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-07T12:14:16.635+08:00  INFO 20308 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-10-07T12:14:22.212+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:22.535+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:22.538+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:35.302+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:35.305+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:35.344+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:36.496+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:36.523+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:43.289+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:46.782+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:46.852+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:46.855+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:46.858+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:46.861+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:51.704+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:51.732+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:51.877+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:14:51.922+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:07.405+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:07.422+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:07.442+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:14.645+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:14.669+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:14.724+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:14.724+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:14.724+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:19.826+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:19.852+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:19.929+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:19.965+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:19.991+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:27.224+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:37.336+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:37.385+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:37.406+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:37.427+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:38.459+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:38.500+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:38.518+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:38.538+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:40.249+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:40.273+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:40.292+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:40.309+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:43.584+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:43.616+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:43.617+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:43.620+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:45.567+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:45.583+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:58.486+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:58.530+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:58.533+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:58.536+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:15:58.538+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:16:12.025+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:16:21.465+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:16:42.294+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:16:42.345+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:16:42.345+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:16:42.352+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:16:42.352+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:19:49.797+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:19:49.814+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:19:52.321+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:19:52.346+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:19:52.403+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:19:52.437+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:19:52.460+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:19:56.104+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:19:56.125+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:02.553+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:02.603+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:02.603+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:02.603+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:02.603+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:06.411+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:12.866+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:20.208+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:22.053+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:30.838+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:33.476+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:52.804+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:52.806+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:52.839+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:20:57.321+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:00.944+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:00.971+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:00.972+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:00.973+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:02.842+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:02.873+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:02.932+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:02.973+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:02.996+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:07.151+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:07.189+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:07.191+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:10.400+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:10.418+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:14.493+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:14.530+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:14.615+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:14.642+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:19.975+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:19.979+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:19.999+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:39.602+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:39.607+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:21:39.635+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:23:09.243+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:23:09.277+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:23:09.343+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:23:09.368+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:23:20.563+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:23:20.594+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:23:20.665+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:23:20.694+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:27:27.451+08:00  WARN 20308 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T12:42:52.707+08:00  INFO 20308 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closing ...
+2026-10-07T12:42:52.711+08:00  INFO 20308 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2026-10-07T13:52:10.577+08:00  INFO 10536 --- [smart-scenic] [main] com.ikun.Main                            : Starting Main using Java 25.0.3 with PID 10536 (A:\graduation_project\smart-scenic\target\classes started by 23600 in A:\graduation_project\smart-scenic)
+2026-10-07T13:52:10.579+08:00 DEBUG 10536 --- [smart-scenic] [main] com.ikun.Main                            : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-10-07T13:52:10.579+08:00  INFO 10536 --- [smart-scenic] [main] com.ikun.Main                            : The following 1 profile is active: "dev"
+2026-10-07T13:52:11.611+08:00  INFO 10536 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-10-07T13:52:11.613+08:00  INFO 10536 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-10-07T13:52:11.656+08:00  INFO 10536 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 26 ms. Found 0 Redis repository interfaces.
+2026-10-07T13:52:12.419+08:00  INFO 10536 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-07T13:52:12.435+08:00  INFO 10536 --- [smart-scenic] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-07T13:52:12.435+08:00  INFO 10536 --- [smart-scenic] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-10-07T13:52:12.506+08:00  INFO 10536 --- [smart-scenic] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-10-07T13:52:12.507+08:00  INFO 10536 --- [smart-scenic] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1878 ms
+2026-10-07T13:52:12.627+08:00  INFO 10536 --- [smart-scenic] [main] c.a.d.s.b.a.DruidDataSourceAutoConfigure : Init DruidDataSource
+2026-10-07T13:52:13.019+08:00  INFO 10536 --- [smart-scenic] [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2026-10-07T13:52:14.575+08:00  INFO 10536 --- [smart-scenic] [main] com.ikun.util.AesUtil                    : 敏感数据加密已启用：AES-256-GCM（密钥长度 256 bit）
+2026-10-07T13:52:15.282+08:00  INFO 10536 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-10-07T13:52:15.291+08:00  INFO 10536 --- [smart-scenic] [main] com.ikun.Main                            : Started Main in 5.222 seconds (process running for 5.85)
+2026-10-07T13:52:15.706+08:00  INFO 10536 --- [smart-scenic] [main] c.i.r.DataEncryptionMigrationRunner      : 敏感数据加密迁移完成：共加密 14 条明文手机号，并回填 SHA-256 摘要
+2026-10-07T13:52:22.859+08:00  INFO 10536 --- [smart-scenic] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-07T13:52:22.860+08:00  INFO 10536 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-07T13:52:22.860+08:00  INFO 10536 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-10-07T13:52:33.749+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:52:34.031+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:52:34.036+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:52:42.208+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:52:42.210+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:52:42.214+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:52:43.005+08:00 ERROR 10536 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupIdNotExist，msg=人员库ID不存在。
+2026-10-07T13:52:43.005+08:00 ERROR 10536 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupIdNotExist，msg=人员库ID不存在。
+2026-10-07T13:52:43.005+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库ID不存在。
+2026-10-07T13:52:43.005+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库ID不存在。
+2026-10-07T13:52:43.031+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:52:52.108+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:52:52.111+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:52:52.142+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:00.414+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:10.370+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:10.399+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:22.039+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:22.042+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:22.046+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:22.238+08:00 ERROR 10536 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupIdNotExist，msg=人员库ID不存在。
+2026-10-07T13:53:22.247+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库ID不存在。
+2026-10-07T13:53:22.254+08:00 ERROR 10536 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupIdNotExist，msg=人员库ID不存在。
+2026-10-07T13:53:22.256+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库ID不存在。
+2026-10-07T13:53:22.267+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:36.262+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:36.264+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:36.289+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:43.442+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:43.675+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:43.677+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:43.689+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:53:43.738+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:54:02.471+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:54:02.472+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:54:02.473+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:54:02.668+08:00 ERROR 10536 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupIdNotExist，msg=人员库ID不存在。
+2026-10-07T13:54:02.668+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库ID不存在。
+2026-10-07T13:54:02.696+08:00 ERROR 10536 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupIdNotExist，msg=人员库ID不存在。
+2026-10-07T13:54:02.696+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库ID不存在。
+2026-10-07T13:54:02.706+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:58:39.680+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:58:39.682+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:58:39.685+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:58:40.202+08:00 ERROR 10536 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupIdNotExist，msg=人员库ID不存在。
+2026-10-07T13:58:40.203+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库ID不存在。
+2026-10-07T13:58:40.218+08:00 ERROR 10536 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupIdNotExist，msg=人员库ID不存在。
+2026-10-07T13:58:40.218+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T13:58:40.218+08:00  WARN 10536 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库ID不存在。
+2026-10-07T14:00:53.372+08:00  INFO 10536 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closing ...
+2026-10-07T14:00:53.376+08:00  INFO 10536 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2026-10-07T14:00:57.470+08:00  INFO 29624 --- [smart-scenic] [main] com.ikun.Main                            : Starting Main using Java 25.0.3 with PID 29624 (A:\graduation_project\smart-scenic\target\classes started by 23600 in A:\graduation_project\smart-scenic)
+2026-10-07T14:00:57.472+08:00 DEBUG 29624 --- [smart-scenic] [main] com.ikun.Main                            : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-10-07T14:00:57.473+08:00  INFO 29624 --- [smart-scenic] [main] com.ikun.Main                            : The following 1 profile is active: "dev"
+2026-10-07T14:00:58.390+08:00  INFO 29624 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-10-07T14:00:58.392+08:00  INFO 29624 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-10-07T14:00:58.439+08:00  INFO 29624 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 34 ms. Found 0 Redis repository interfaces.
+2026-10-07T14:00:59.089+08:00  INFO 29624 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-07T14:00:59.102+08:00  INFO 29624 --- [smart-scenic] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-07T14:00:59.102+08:00  INFO 29624 --- [smart-scenic] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-10-07T14:00:59.181+08:00  INFO 29624 --- [smart-scenic] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-10-07T14:00:59.182+08:00  INFO 29624 --- [smart-scenic] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1663 ms
+2026-10-07T14:00:59.311+08:00  INFO 29624 --- [smart-scenic] [main] c.a.d.s.b.a.DruidDataSourceAutoConfigure : Init DruidDataSource
+2026-10-07T14:00:59.700+08:00  INFO 29624 --- [smart-scenic] [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2026-10-07T14:01:01.177+08:00  INFO 29624 --- [smart-scenic] [main] com.ikun.util.AesUtil                    : 敏感数据加密已启用：AES-256-GCM（密钥长度 256 bit）
+2026-10-07T14:01:01.808+08:00  INFO 29624 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-10-07T14:01:01.816+08:00  INFO 29624 --- [smart-scenic] [main] com.ikun.Main                            : Started Main in 4.776 seconds (process running for 5.165)
+2026-10-07T14:01:02.222+08:00  INFO 29624 --- [smart-scenic] [main] c.i.r.DataEncryptionMigrationRunner      : 敏感数据加密迁移完成：共加密 14 条明文手机号，并回填 SHA-256 摘要
+2026-10-07T14:01:04.970+08:00  INFO 29624 --- [smart-scenic] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-07T14:01:04.971+08:00  INFO 29624 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-07T14:01:04.972+08:00  INFO 29624 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-10-07T14:01:05.271+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:01:05.722+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:01:05.724+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:01:09.827+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:01:09.830+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:01:09.905+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:01:22.578+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:01:22.582+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:01:22.584+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:01:23.247+08:00 ERROR 29624 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.FaceModelVersionIllegal，msg=算法模型版本不合法。
+2026-10-07T14:01:23.248+08:00 ERROR 29624 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.FaceModelVersionIllegal，msg=算法模型版本不合法。
+2026-10-07T14:01:23.248+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：算法模型版本不合法。
+2026-10-07T14:01:23.248+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：算法模型版本不合法。
+2026-10-07T14:01:23.267+08:00  WARN 29624 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:06:19.621+08:00  INFO 29624 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closing ...
+2026-10-07T14:06:19.628+08:00  INFO 29624 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2026-10-07T14:06:23.078+08:00  INFO 8228 --- [smart-scenic] [main] com.ikun.Main                            : Starting Main using Java 25.0.3 with PID 8228 (A:\graduation_project\smart-scenic\target\classes started by 23600 in A:\graduation_project\smart-scenic)
+2026-10-07T14:06:23.079+08:00 DEBUG 8228 --- [smart-scenic] [main] com.ikun.Main                            : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-10-07T14:06:23.080+08:00  INFO 8228 --- [smart-scenic] [main] com.ikun.Main                            : The following 1 profile is active: "dev"
+2026-10-07T14:06:23.965+08:00  INFO 8228 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-10-07T14:06:23.967+08:00  INFO 8228 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-10-07T14:06:23.999+08:00  INFO 8228 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 22 ms. Found 0 Redis repository interfaces.
+2026-10-07T14:06:24.585+08:00  INFO 8228 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-07T14:06:24.598+08:00  INFO 8228 --- [smart-scenic] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-07T14:06:24.598+08:00  INFO 8228 --- [smart-scenic] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-10-07T14:06:24.666+08:00  INFO 8228 --- [smart-scenic] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-10-07T14:06:24.666+08:00  INFO 8228 --- [smart-scenic] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1542 ms
+2026-10-07T14:06:24.768+08:00  INFO 8228 --- [smart-scenic] [main] c.a.d.s.b.a.DruidDataSourceAutoConfigure : Init DruidDataSource
+2026-10-07T14:06:25.126+08:00  INFO 8228 --- [smart-scenic] [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2026-10-07T14:06:26.509+08:00  INFO 8228 --- [smart-scenic] [main] com.ikun.util.AesUtil                    : 敏感数据加密已启用：AES-256-GCM（密钥长度 256 bit）
+2026-10-07T14:06:27.083+08:00  INFO 8228 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-10-07T14:06:27.091+08:00  INFO 8228 --- [smart-scenic] [main] com.ikun.Main                            : Started Main in 4.447 seconds (process running for 4.847)
+2026-10-07T14:06:27.455+08:00  INFO 8228 --- [smart-scenic] [main] c.i.r.DataEncryptionMigrationRunner      : 敏感数据加密迁移完成：共加密 14 条明文手机号，并回填 SHA-256 摘要
+2026-10-07T14:06:32.477+08:00  INFO 8228 --- [smart-scenic] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-07T14:06:32.477+08:00  INFO 8228 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-07T14:06:32.478+08:00  INFO 8228 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-10-07T14:06:32.779+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:06:33.217+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:06:33.222+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:06:38.297+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:06:38.300+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:06:38.344+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:06:51.468+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:06:51.471+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:06:51.475+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:06:52.225+08:00  INFO 8228 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TencentFaceClient       : 腾讯云人脸库已创建：smart-scenic
+2026-10-07T14:06:52.252+08:00 ERROR 8228 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupIdAlreadyExist，msg=人员库ID已经存在。人员库ID不可重复。
+2026-10-07T14:06:52.254+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库ID已经存在。人员库ID不可重复。
+2026-10-07T14:06:52.268+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:07:11.539+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:07:11.578+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:07:11.694+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:07:11.698+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:07:11.702+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:07:14.598+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:07:14.602+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:07:14.604+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:07:14.822+08:00 ERROR 8228 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupNameAlreadyExist，msg=人员库名称已经存在。人员库名称不可重复。
+2026-10-07T14:07:14.822+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库名称已经存在。人员库名称不可重复。
+2026-10-07T14:07:14.835+08:00 ERROR 8228 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TencentFaceClient       : 腾讯云人脸识别调用失败：code=InvalidParameterValue.GroupNameAlreadyExist，msg=人员库名称已经存在。人员库名称不可重复。
+2026-10-07T14:07:14.836+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.common.GlobalExceptionHandler   : 业务异常：人脸识别服务调用失败：人员库名称已经存在。人员库名称不可重复。
+2026-10-07T14:07:14.853+08:00  WARN 8228 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:09:36.539+08:00  INFO 8228 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closing ...
+2026-10-07T14:09:36.546+08:00  INFO 8228 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2026-10-07T14:09:39.977+08:00  INFO 27988 --- [smart-scenic] [main] com.ikun.Main                            : Starting Main using Java 25.0.3 with PID 27988 (A:\graduation_project\smart-scenic\target\classes started by 23600 in A:\graduation_project\smart-scenic)
+2026-10-07T14:09:39.979+08:00 DEBUG 27988 --- [smart-scenic] [main] com.ikun.Main                            : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-10-07T14:09:39.979+08:00  INFO 27988 --- [smart-scenic] [main] com.ikun.Main                            : The following 1 profile is active: "dev"
+2026-10-07T14:09:40.928+08:00  INFO 27988 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-10-07T14:09:40.931+08:00  INFO 27988 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-10-07T14:09:40.966+08:00  INFO 27988 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 24 ms. Found 0 Redis repository interfaces.
+2026-10-07T14:09:41.597+08:00  INFO 27988 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-07T14:09:41.613+08:00  INFO 27988 --- [smart-scenic] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-07T14:09:41.613+08:00  INFO 27988 --- [smart-scenic] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-10-07T14:09:41.686+08:00  INFO 27988 --- [smart-scenic] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-10-07T14:09:41.686+08:00  INFO 27988 --- [smart-scenic] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1659 ms
+2026-10-07T14:09:41.804+08:00  INFO 27988 --- [smart-scenic] [main] c.a.d.s.b.a.DruidDataSourceAutoConfigure : Init DruidDataSource
+2026-10-07T14:09:42.174+08:00  INFO 27988 --- [smart-scenic] [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2026-10-07T14:09:43.558+08:00  INFO 27988 --- [smart-scenic] [main] com.ikun.util.AesUtil                    : 敏感数据加密已启用：AES-256-GCM（密钥长度 256 bit）
+2026-10-07T14:09:44.197+08:00  INFO 27988 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-10-07T14:09:44.204+08:00  INFO 27988 --- [smart-scenic] [main] com.ikun.Main                            : Started Main in 4.652 seconds (process running for 5.048)
+2026-10-07T14:09:44.647+08:00  INFO 27988 --- [smart-scenic] [main] c.i.r.DataEncryptionMigrationRunner      : 敏感数据加密迁移完成：共加密 14 条明文手机号，并回填 SHA-256 摘要
+2026-10-07T14:09:52.600+08:00  INFO 27988 --- [smart-scenic] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-07T14:09:52.600+08:00  INFO 27988 --- [smart-scenic] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-07T14:09:52.601+08:00  INFO 27988 --- [smart-scenic] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-10-07T14:09:52.991+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:09:53.418+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:09:53.421+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:09:56.305+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:09:56.309+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:09:56.346+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:10:05.367+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:10:06.784+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:10:10.832+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:10:26.816+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:10:28.596+08:00  INFO 27988 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TencentFaceClient       : 人脸入库成功：personId=U2，faceId=7025382483773409639，faceRect=有
+2026-10-07T14:10:34.100+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:10:34.103+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:10:34.106+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:10:34.725+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:10:45.022+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:11:09.335+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:11:48.495+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:11:51.052+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:11:54.220+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:11:54.221+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:11:54.223+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:11:55.298+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:12:33.262+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:12:33.263+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:12:33.302+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:13:05.262+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:13:10.335+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:13:14.118+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:13:26.301+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:13:26.330+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:13:37.139+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:13:41.425+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:13:45.515+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:13:46.820+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:13:56.851+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:17:18.304+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:17:18.873+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:17:18.874+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:17:18.908+08:00  WARN 27988 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:19:26.779+08:00  INFO 27988 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closing ...
+2026-10-07T14:19:26.784+08:00  INFO 27988 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2026-10-07T14:19:28.433+08:00  INFO 16608 --- [smart-scenic] [main] com.ikun.Main                            : Starting Main using Java 25.0.3 with PID 16608 (A:\graduation_project\smart-scenic\target\classes started by 23600 in A:\graduation_project\smart-scenic)
+2026-10-07T14:19:28.435+08:00 DEBUG 16608 --- [smart-scenic] [main] com.ikun.Main                            : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-10-07T14:19:28.436+08:00  INFO 16608 --- [smart-scenic] [main] com.ikun.Main                            : The following 1 profile is active: "dev"
+2026-10-07T14:19:29.305+08:00  INFO 16608 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-10-07T14:19:29.307+08:00  INFO 16608 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-10-07T14:19:29.354+08:00  INFO 16608 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 24 ms. Found 0 Redis repository interfaces.
+2026-10-07T14:19:29.982+08:00  INFO 16608 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-07T14:19:29.994+08:00  INFO 16608 --- [smart-scenic] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-07T14:19:29.994+08:00  INFO 16608 --- [smart-scenic] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-10-07T14:19:30.059+08:00  INFO 16608 --- [smart-scenic] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-10-07T14:19:30.060+08:00  INFO 16608 --- [smart-scenic] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1573 ms
+2026-10-07T14:19:30.175+08:00  INFO 16608 --- [smart-scenic] [main] c.a.d.s.b.a.DruidDataSourceAutoConfigure : Init DruidDataSource
+2026-10-07T14:19:30.522+08:00  INFO 16608 --- [smart-scenic] [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2026-10-07T14:19:31.775+08:00  INFO 16608 --- [smart-scenic] [main] com.ikun.util.AesUtil                    : 敏感数据加密已启用：AES-256-GCM（密钥长度 256 bit）
+2026-10-07T14:19:32.351+08:00  INFO 16608 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-10-07T14:19:32.359+08:00  INFO 16608 --- [smart-scenic] [main] com.ikun.Main                            : Started Main in 4.436 seconds (process running for 4.878)
+2026-10-07T14:19:32.761+08:00  INFO 16608 --- [smart-scenic] [main] c.i.r.DataEncryptionMigrationRunner      : 敏感数据加密迁移完成：共加密 14 条明文手机号，并回填 SHA-256 摘要
+2026-10-07T14:19:41.146+08:00  INFO 16608 --- [smart-scenic] [http-nio-8080-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-07T14:19:41.146+08:00  INFO 16608 --- [smart-scenic] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-07T14:19:41.147+08:00  INFO 16608 --- [smart-scenic] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-10-07T14:19:41.474+08:00  WARN 16608 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:19:41.925+08:00  WARN 16608 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:19:41.928+08:00  WARN 16608 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:19:47.103+08:00  WARN 16608 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:19:47.106+08:00  WARN 16608 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:19:47.143+08:00  WARN 16608 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:19:50.818+08:00  WARN 16608 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:19:50.847+08:00  WARN 16608 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:20:29.713+08:00  WARN 16608 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:20:35.852+08:00  WARN 16608 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T14:20:52.606+08:00  INFO 16608 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closing ...
+2026-10-07T14:20:52.612+08:00  INFO 16608 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2026-10-07T18:51:49.823+08:00  INFO 28296 --- [smart-scenic] [main] com.ikun.Main                            : Starting Main using Java 25.0.3 with PID 28296 (A:\graduation_project\smart-scenic\target\classes started by 23600 in A:\graduation_project\smart-scenic)
+2026-10-07T18:51:49.825+08:00 DEBUG 28296 --- [smart-scenic] [main] com.ikun.Main                            : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-10-07T18:51:49.825+08:00  INFO 28296 --- [smart-scenic] [main] com.ikun.Main                            : The following 1 profile is active: "dev"
+2026-10-07T18:51:50.814+08:00  INFO 28296 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-10-07T18:51:50.817+08:00  INFO 28296 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-10-07T18:51:50.858+08:00  INFO 28296 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 27 ms. Found 0 Redis repository interfaces.
+2026-10-07T18:51:51.615+08:00  INFO 28296 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-07T18:51:51.632+08:00  INFO 28296 --- [smart-scenic] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-07T18:51:51.632+08:00  INFO 28296 --- [smart-scenic] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-10-07T18:51:51.705+08:00  INFO 28296 --- [smart-scenic] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-10-07T18:51:51.706+08:00  INFO 28296 --- [smart-scenic] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1835 ms
+2026-10-07T18:51:51.829+08:00  INFO 28296 --- [smart-scenic] [main] c.a.d.s.b.a.DruidDataSourceAutoConfigure : Init DruidDataSource
+2026-10-07T18:51:52.205+08:00  INFO 28296 --- [smart-scenic] [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2026-10-07T18:51:53.655+08:00  INFO 28296 --- [smart-scenic] [main] com.ikun.util.AesUtil                    : 敏感数据加密已启用：AES-256-GCM（密钥长度 256 bit）
+2026-10-07T18:51:54.333+08:00  INFO 28296 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-10-07T18:51:54.343+08:00  INFO 28296 --- [smart-scenic] [main] com.ikun.Main                            : Started Main in 5.045 seconds (process running for 5.572)
+2026-10-07T18:51:54.765+08:00  INFO 28296 --- [smart-scenic] [main] c.i.r.DataEncryptionMigrationRunner      : 敏感数据加密迁移完成：共加密 14 条明文手机号，并回填 SHA-256 摘要
+2026-10-07T18:52:02.897+08:00  INFO 28296 --- [smart-scenic] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-07T18:52:02.897+08:00  INFO 28296 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-07T18:52:02.898+08:00  INFO 28296 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-10-07T18:52:08.893+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:09.170+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:09.175+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:15.263+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:15.304+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:16.603+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:16.606+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:19.831+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:19.860+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:19.863+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:19.870+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:22.499+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:22.580+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:22.671+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:22.708+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:22.746+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:25.419+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:25.419+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:25.421+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:26.864+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:29.275+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:29.302+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:29.446+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:29.491+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:33.101+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:54.812+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:54.813+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:54.836+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:52:56.415+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:53:01.835+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:53:29.388+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:53:29.389+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:53:29.418+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:53:33.589+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-16] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:53:47.008+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-17] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:53:56.304+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:53:56.309+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-18] com.ikun.common.GlobalExceptionHandler   : 业务异常：内置超级管理员账号不允许删除
+2026-10-07T18:54:11.341+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-1] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:54:11.364+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-20] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:54:14.111+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-19] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:54:14.112+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-2] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:54:33.955+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-3] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:54:33.988+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-4] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:54:47.266+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-5] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:54:49.078+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-6] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:54:49.079+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:54:49.100+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-9] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:55:04.332+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-8] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:55:04.357+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-10] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:55:05.548+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:55:05.549+08:00  WARN 28296 --- [smart-scenic] [http-nio-8080-exec-7] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T18:59:51.823+08:00  INFO 28296 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closing ...
+2026-10-07T18:59:51.826+08:00  INFO 28296 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2026-10-07T19:43:41.983+08:00  INFO 19896 --- [smart-scenic] [main] com.ikun.Main                            : Starting Main using Java 25.0.3 with PID 19896 (A:\graduation_project\smart-scenic\target\classes started by 23600 in A:\graduation_project\smart-scenic)
+2026-10-07T19:43:41.984+08:00 DEBUG 19896 --- [smart-scenic] [main] com.ikun.Main                            : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-10-07T19:43:41.985+08:00  INFO 19896 --- [smart-scenic] [main] com.ikun.Main                            : The following 1 profile is active: "dev"
+2026-10-07T19:43:42.889+08:00  INFO 19896 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-10-07T19:43:42.891+08:00  INFO 19896 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-10-07T19:43:42.924+08:00  INFO 19896 --- [smart-scenic] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 23 ms. Found 0 Redis repository interfaces.
+2026-10-07T19:43:43.558+08:00  INFO 19896 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-07T19:43:43.575+08:00  INFO 19896 --- [smart-scenic] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-07T19:43:43.575+08:00  INFO 19896 --- [smart-scenic] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-10-07T19:43:43.655+08:00  INFO 19896 --- [smart-scenic] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-10-07T19:43:43.655+08:00  INFO 19896 --- [smart-scenic] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1616 ms
+2026-10-07T19:43:43.776+08:00  INFO 19896 --- [smart-scenic] [main] c.a.d.s.b.a.DruidDataSourceAutoConfigure : Init DruidDataSource
+2026-10-07T19:43:44.185+08:00  INFO 19896 --- [smart-scenic] [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2026-10-07T19:43:45.750+08:00  INFO 19896 --- [smart-scenic] [main] com.ikun.util.AesUtil                    : 敏感数据加密已启用：AES-256-GCM（密钥长度 256 bit）
+2026-10-07T19:43:46.477+08:00  INFO 19896 --- [smart-scenic] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-10-07T19:43:46.487+08:00  INFO 19896 --- [smart-scenic] [main] com.ikun.Main                            : Started Main in 4.954 seconds (process running for 5.403)
+2026-10-07T19:43:46.910+08:00  INFO 19896 --- [smart-scenic] [main] c.i.r.DataEncryptionMigrationRunner      : 敏感数据加密迁移完成：共加密 14 条明文手机号，并回填 SHA-256 摘要
+2026-10-07T19:45:12.277+08:00  INFO 19896 --- [smart-scenic] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-07T19:45:12.277+08:00  INFO 19896 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-07T19:45:12.279+08:00  INFO 19896 --- [smart-scenic] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-10-07T19:46:17.745+08:00  WARN 19896 --- [smart-scenic] [http-nio-8080-exec-11] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T19:46:18.049+08:00  WARN 19896 --- [smart-scenic] [http-nio-8080-exec-12] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T19:46:23.504+08:00  WARN 19896 --- [smart-scenic] [http-nio-8080-exec-13] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T19:46:25.895+08:00  WARN 19896 --- [smart-scenic] [http-nio-8080-exec-14] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T19:46:29.338+08:00  WARN 19896 --- [smart-scenic] [http-nio-8080-exec-15] com.ikun.service.TokenBlacklistService   : Token 黑名单校验失败（Redis 异常），本次放行：Unable to connect to Redis
+2026-10-07T19:48:33.282+08:00  INFO 19896 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closing ...
+2026-10-07T19:48:33.286+08:00  INFO 19896 --- [smart-scenic] [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed

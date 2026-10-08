@@ -1,0 +1,4 @@
+spring:
+  profiles:
+    # 默认使用开发环境，生产环境启动参数加 --spring.profiles.active=prod
+    active: dev
