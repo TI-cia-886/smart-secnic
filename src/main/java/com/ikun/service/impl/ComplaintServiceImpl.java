@@ -73,7 +73,7 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
 
     @Override
     public PageResult<ComplaintVO> pageQuery(Integer pageNum, Integer pageSize, String keyword, Long scenicId,
-                                             String type, String priority, String status, String sentiment,
+                                             String type, String status, String sentiment,
                                              LocalDate startDate, LocalDate endDate) {
         Long scopeScenicId = ScenicScope.resolve(scenicId);
         LambdaQueryWrapper<Complaint> wrapper = Wrappers.<Complaint>lambdaQuery()
@@ -83,7 +83,6 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
                         .like(Complaint::getTitle, keyword).or()
                         .like(Complaint::getTouristName, keyword))
                 .eq(StringUtils.hasText(type), Complaint::getType, type)
-                .eq(StringUtils.hasText(priority), Complaint::getPriority, priority)
                 .eq(StringUtils.hasText(status), Complaint::getStatus, status)
                 .eq(StringUtils.hasText(sentiment), Complaint::getSentiment, sentiment)
                 .ge(startDate != null, Complaint::getCreateTime,
@@ -197,16 +196,11 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
         update.setSentiment(label);
         update.setSentimentScore(BigDecimal.valueOf(score).setScale(2, RoundingMode.HALF_UP));
         update.setSentimentTime(LocalDateTime.now());
-        // 负面工单自动升级为紧急，避免情绪激烈的投诉被当成普通工单排在队尾
-        if ("NEGATIVE".equals(label) && !"URGENT".equals(complaint.getPriority())) {
-            update.setPriority("URGENT");
-        }
         updateById(update);
 
         complaint.setSentiment(label);
         complaint.setSentimentScore(update.getSentimentScore());
         complaint.setSentimentTime(update.getSentimentTime());
-        complaint.setPriority(update.getPriority() == null ? complaint.getPriority() : update.getPriority());
         log.info("工单情感分析完成：complaintId={}，score={}，label={}", complaintId, score, label);
         return toVOList(Collections.singletonList(complaint)).get(0);
     }
@@ -233,7 +227,6 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
         Map<String, Long> sentimentCount = new LinkedHashMap<>();
         Map<String, Long> keywordCount = new LinkedHashMap<>();
         int negative = 0;
-        int urgent = 0;
         int pending = 0;
 
         for (Complaint complaint : complaints) {
@@ -241,9 +234,6 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
             sentimentCount.merge(sentimentText(complaint.getSentiment()), 1L, Long::sum);
             if ("NEGATIVE".equals(complaint.getSentiment())) {
                 negative++;
-            }
-            if ("URGENT".equals(complaint.getPriority())) {
-                urgent++;
             }
             if (STATUS_PENDING.equals(complaint.getStatus())) {
                 pending++;
@@ -268,7 +258,9 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
         Map<String, Object> context = new LinkedHashMap<>();
         context.put("total", complaints.size());
         context.put("negative", negative);
-        context.put("urgent", urgent);
+        // 优先级字段已废弃：原先 URGENT 就是由「负面情感」自动升级而来，两者等价，
+        // 这里沿用负面数作为紧急数，AI 归纳里的「紧急 N 条」语义不丢失
+        context.put("urgent", negative);
         context.put("mainIssue", mainIssue);
         if (!complaints.isEmpty()) {
             context.put("scenicName", resolveScenicName(complaints.get(0).getScenicId()));
@@ -277,7 +269,7 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
         ComplaintSummaryVO vo = new ComplaintSummaryVO();
         vo.setTotal(complaints.size());
         vo.setNegativeCount(negative);
-        vo.setUrgentCount(urgent);
+        vo.setUrgentCount(negative);
         vo.setPendingCount(pending);
         vo.setTypeDist(toStatItems(typeCount));
         vo.setSentimentDist(toStatItems(sentimentCount));
@@ -351,8 +343,6 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
         vo.setContent(complaint.getContent());
         vo.setType(complaint.getType());
         vo.setTypeText(typeText(complaint.getType()));
-        vo.setPriority(complaint.getPriority());
-        vo.setPriorityText("URGENT".equals(complaint.getPriority()) ? "紧急" : "普通");
         vo.setStatus(complaint.getStatus());
         vo.setStatusText(statusText(complaint.getStatus()));
         vo.setSentiment(complaint.getSentiment());

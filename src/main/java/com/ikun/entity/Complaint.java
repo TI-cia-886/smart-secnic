@@ -45,7 +45,13 @@ public class Complaint implements Serializable {
     /** 类型：COMPLAINT投诉 SUGGESTION建议 CONSULT咨询 */
     private String type;
 
-    /** 优先级：NORMAL普通 URGENT紧急 */
+    /**
+     * 优先级：NORMAL普通 URGENT紧急
+     *
+     * @deprecated 业务已不再使用优先级（紧急程度完全由情感分析结果体现，
+     *             两者语义重合，留一个即可）。字段保留仅为兼容历史数据，新数据不再写入。
+     */
+    @Deprecated
     private String priority;
 
     /** 状态：PENDING待处理 PROCESSING处理中 CLOSED已完结 */

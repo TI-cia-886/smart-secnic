@@ -9,7 +9,9 @@ import com.ikun.entity.TicketType;
 import com.ikun.vo.AiChatReplyVO;
 import com.ikun.vo.AppHomeVO;
 import com.ikun.vo.AppRouteVO;
+import com.ikun.vo.TicketAvailabilityVO;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -35,6 +37,14 @@ public interface AppScenicService {
     List<TicketType> listTickets(Long scenicId);
 
     TicketType ticketDetail(Long ticketTypeId);
+
+    /**
+     * 票种在某一天的可预约情况（各时段余票），供购票页实时展示。
+     *
+     * @param ticketTypeId 票种ID
+     * @param playDate     游玩日期，为空时默认今天
+     */
+    TicketAvailabilityVO ticketAvailability(Long ticketTypeId, LocalDate playDate);
 
     List<Announcement> listAnnouncements(Long scenicId, Integer limit);
 

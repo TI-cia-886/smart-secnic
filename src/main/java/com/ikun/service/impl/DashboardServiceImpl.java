@@ -19,11 +19,13 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 /**
@@ -45,11 +47,17 @@ public class DashboardServiceImpl implements DashboardService {
     /** 趋势天数（含今天） */
     private static final int TREND_DAYS = 7;
 
+    /** 统一离园时刻：当日 18:00 后实时在园归零（与客流概览/订单核销侧同一口径） */
+    private static final int LEAVE_HOUR = 18;
+
     /** 计入营收的订单状态 */
     private static final List<String> REVENUE_STATUS = List.of("PAID", "VERIFIED");
 
     /** 首页公告展示条数 */
     private static final int ANNOUNCEMENT_LIMIT = 6;
+
+    /** 趋势图 X 轴日期格式：M/d，随数据一起下发，避免前端按本地时区另算导致错位 */
+    private static final DateTimeFormatter TREND_DATE_FMT = DateTimeFormatter.ofPattern("M/d");
 
     private final ScenicAreaMapper scenicAreaMapper;
     private final TouristMapper touristMapper;
@@ -127,6 +135,11 @@ public class DashboardServiceImpl implements DashboardService {
 
         long todayEnter = enterByDay.getOrDefault(today, 0L);
         long onlineNow = onlinePeakByDay.getOrDefault(today, 0).longValue();
+        // 业务闭环：当日 18:00 统一离园，之后实时在园归零；
+        // 趋势曲线保留当日峰值（历史事实），仅实时数字清零
+        if (LocalTime.now().getHour() >= LEAVE_HOUR) {
+            onlineNow = 0;
+        }
         vo.setTodayEnterCount(todayEnter);
         vo.setCurrentOnlineCount(onlineNow);
         vo.setOnlineCount(onlineNow);
@@ -147,39 +160,52 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         // ===================== 订单 / 营收：近 7 日趋势 =====================
-        List<TicketOrder> weekOrders = ticketOrderMapper.selectList(Wrappers.<TicketOrder>lambdaQuery()
-                .ge(TicketOrder::getPlayDate, start)
-                .le(TicketOrder::getPlayDate, today)
+        // 口径说明：营收是「钱什么时候到账」，必须按支付时间 pay_time 归集。
+        // 早期实现按游玩日期 play_date 统计，游客今天买三天后的票会出现
+        // 「今天已收款、趋势图上却是空的，三天后才冒出数据」的错位，近 7 天几乎必然为空。
+        LocalDateTime weekEndExclusive = today.plusDays(1).atStartOfDay();
+
+        // 成交订单：支付时间落在窗口内，且状态为已支付 / 已核销（与营收同一口径）
+        List<TicketOrder> weekPaidOrders = ticketOrderMapper.selectList(Wrappers.<TicketOrder>lambdaQuery()
+                .ge(TicketOrder::getPayTime, weekStart)
+                .lt(TicketOrder::getPayTime, weekEndExclusive)
+                .in(TicketOrder::getStatus, REVENUE_STATUS)
                 .eq(scenicId != null, TicketOrder::getScenicId, scenicId));
 
-        Map<LocalDate, Long> orderByDay = weekOrders.stream()
-                .filter(o -> o.getPlayDate() != null)
-                .collect(Collectors.groupingBy(TicketOrder::getPlayDate, Collectors.counting()));
+        Map<LocalDate, Long> paidOrderByDay = weekPaidOrders.stream()
+                .filter(o -> o.getPayTime() != null)
+                .collect(Collectors.groupingBy(o -> o.getPayTime().toLocalDate(), Collectors.counting()));
 
         Map<LocalDate, BigDecimal> revenueByDay = new HashMap<>();
-        weekOrders.stream()
-                .filter(o -> o.getPlayDate() != null && o.getTotalAmount() != null)
-                .filter(o -> REVENUE_STATUS.contains(o.getStatus()))
-                .forEach(o -> revenueByDay.merge(o.getPlayDate(), o.getTotalAmount(), BigDecimal::add));
+        weekPaidOrders.stream()
+                .filter(o -> o.getPayTime() != null && o.getTotalAmount() != null)
+                .forEach(o -> revenueByDay.merge(o.getPayTime().toLocalDate(),
+                        o.getTotalAmount(), BigDecimal::add));
 
+        List<String> trendDates = new ArrayList<>(TREND_DAYS);
         List<Long> orderTrend = new ArrayList<>(TREND_DAYS);
         List<Long> revenueTrend = new ArrayList<>(TREND_DAYS);
         for (int i = 0; i < TREND_DAYS; i++) {
             LocalDate day = start.plusDays(i);
-            orderTrend.add(orderByDay.getOrDefault(day, 0L));
+            trendDates.add(day.format(TREND_DATE_FMT));
+            orderTrend.add(paidOrderByDay.getOrDefault(day, 0L));
             revenueTrend.add(revenueByDay.getOrDefault(day, BigDecimal.ZERO)
                     .setScale(0, RoundingMode.HALF_UP).longValue());
         }
+        vo.setTrendDates(trendDates);
         vo.setOrderTrend(orderTrend);
         vo.setRevenueTrend(revenueTrend);
 
-        vo.setTodayOrderCount(orderByDay.getOrDefault(today, 0L));
+        // 今日订单数按下单时间（含待支付），今日营收按支付时间（仅已支付 / 已核销）
+        Long todayOrderCount = ticketOrderMapper.selectCount(Wrappers.<TicketOrder>lambdaQuery()
+                .ge(TicketOrder::getCreateTime, todayStart)
+                .lt(TicketOrder::getCreateTime, weekEndExclusive)
+                .eq(scenicId != null, TicketOrder::getScenicId, scenicId));
+        vo.setTodayOrderCount(todayOrderCount == null ? 0L : todayOrderCount);
         vo.setTodayOrderAmount(revenueByDay.getOrDefault(today, BigDecimal.ZERO));
 
-        // 订单转化率：近 7 日已支付订单数 / 近 7 日入园人次
-        long paidOrders = weekOrders.stream()
-                .filter(o -> REVENUE_STATUS.contains(o.getStatus()))
-                .count();
+        // 订单转化率：近 7 日成交订单数 / 近 7 日入园人次
+        long paidOrders = weekPaidOrders.size();
         long weekEnter = enterTrend.stream().mapToLong(Long::longValue).sum();
         vo.setOrderConversion(rate(paidOrders, weekEnter));
 
@@ -245,7 +271,14 @@ public class DashboardServiceImpl implements DashboardService {
         if (denominator == null || denominator == 0L) {
             return BigDecimal.ZERO;
         }
-        return BigDecimal.valueOf(numerator)
+        BigDecimal v = BigDecimal.valueOf(numerator)
                 .divide(BigDecimal.valueOf(denominator), 4, RoundingMode.HALF_UP);
+        // 比率统一收敛到 [0,1]：客流等基础数据缺失时，分子可能大于分母（例如
+        // 近 7 日只录到 1 次入园却有 4 笔成交订单），直接输出会出现「转化率 400%」
+        // 这种超过 100% 的不可读数值。
+        if (v.signum() < 0) {
+            return BigDecimal.ZERO;
+        }
+        return v.compareTo(BigDecimal.ONE) > 0 ? BigDecimal.ONE : v;
     }
 }

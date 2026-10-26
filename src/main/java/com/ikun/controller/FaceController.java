@@ -23,35 +23,32 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
- * 人脸识别管理接口
+ * 人脸管理接口
  *
  * <p>基于腾讯云人脸识别（IAI）服务，人脸库 GroupId 为 {@code smart-scenic}：
  * <ul>
- *   <li>人脸注册：游客档案照片入库，PersonId 使用游客编号 tourist_no</li>
- *   <li>人脸搜索：1:N 识别，上传照片在人脸库中查找最相似的游客</li>
- *   <li>人脸比对：1:1 验证，计算两张照片的相似度</li>
- *   <li>人脸测试：人脸检测分析，输出年龄 / 性别 / 表情 / 口罩 / 质量分等</li>
+ *   <li>人脸注册：工作人员（后台账号，PersonId=U{userId}）与游客（PersonId=tourist_no）照片入库</li>
+ *   <li>人员管理：人脸库人员分页查询、按对象类型分类展示、删除人员</li>
  * </ul>
- * 每次调用都会落一条 face_record 识别记录，便于审计。</p>
+ * 注册 / 删除操作都会落一条 face_record 记录，便于审计。</p>
  *
  * @author smart-scenic
  */
 @Slf4j
-@Tag(name = "14-人脸识别", description = "腾讯云人脸库管理、人脸注册 / 搜索 / 比对 / 检测")
+@Tag(name = "14-人脸管理", description = "腾讯云人脸库管理：工作人员 / 游客人脸注册与删除")
 @RestController
 @RequestMapping("/face")
 @RequiredArgsConstructor
 public class FaceController {
+
+    /** 人脸照片允许的扩展名：腾讯云 IAI 只接受常见图片格式，其他文件会在服务端报错 */
+    private static final Set<String> ALLOWED_IMAGE_EXT = Set.of("jpg", "jpeg", "png");
 
     private final TencentFaceClient faceClient;
     private final FaceRecordMapper faceRecordMapper;
@@ -77,12 +74,29 @@ public class FaceController {
         return Result.success(faceClient.personList(offset, limit));
     }
 
-    @Operation(summary = "从人脸库删除人员", description = "PersonId 为游客编号 tourist_no；删除后该游客照片不可再被搜索命中")
+    @Operation(summary = "从人脸库删除人员", description = "PersonId 为游客编号 tourist_no（工作人员为 U{userId}）；删除后该游客照片不可再被搜索命中，并同步本地人脸状态")
     @RequirePerm("face:enroll")
-    @OperLog(title = "人脸识别", businessType = "DELETE")
+    @OperLog(title = "人脸管理", businessType = "DELETE")
     @DeleteMapping("/person/{personId}")
     public Result<Void> deletePerson(@PathVariable String personId) {
         faceClient.deletePerson(personId);
+        // 游客人员（非 U 开头）删除后，本地 face_status 同步归零，保证游客列表/档案状态一致
+        if (personId != null && !personId.startsWith("U")) {
+            Tourist tourist = touristMapper.selectOne(
+                    Wrappers.<Tourist>lambdaQuery().eq(Tourist::getTouristNo, personId));
+            if (tourist != null) {
+                Tourist upd = new Tourist();
+                upd.setId(tourist.getId());
+                upd.setFaceStatus(0);
+                touristMapper.updateById(upd);
+            }
+            FaceRecord rec = new FaceRecord();
+            rec.setRecordType("DELETE");
+            rec.setTouristNo(personId);
+            rec.setDetail("人脸删除，personId=" + personId);
+            rec.setOperatorId(UserContext.getUserId());
+            faceRecordMapper.insert(rec);
+        }
         return Result.success("已从人脸库删除", null);
     }
 
@@ -90,7 +104,7 @@ public class FaceController {
 
     @Operation(summary = "游客人脸注册", description = "上传游客照片加入人脸库；PersonId 使用游客编号，同一游客重复注册会被拒绝")
     @RequirePerm("face:enroll")
-    @OperLog(title = "人脸识别", businessType = "INSERT")
+    @OperLog(title = "人脸管理", businessType = "INSERT")
     @PostMapping("/enroll")
     public Result<Map<String, Object>> enroll(@RequestParam Long touristId,
                                               @RequestPart("file") MultipartFile file) throws IOException {
@@ -120,7 +134,7 @@ public class FaceController {
 
     @Operation(summary = "账号人脸注册", description = "上传后台账号照片加入人脸库；PersonId 为 U{userId}，用于工作人员人脸登录/识别")
     @RequirePerm("face:enroll")
-    @OperLog(title = "人脸识别", businessType = "INSERT")
+    @OperLog(title = "人脸管理", businessType = "INSERT")
     @PostMapping("/enroll/account")
     public Result<Map<String, Object>> enrollAccount(@RequestParam Long userId,
                                                      @RequestPart("file") MultipartFile file) throws IOException {
@@ -149,103 +163,9 @@ public class FaceController {
         return Result.success("账号人脸注册成功", out);
     }
 
-    /* ==================== 人脸搜索（1:N） ==================== */
+    /* ==================== 操作记录 ==================== */
 
-    @Operation(summary = "人脸搜索", description = "上传照片在 smart-scenic 人脸库中 1:N 检索，返回最相似的候选游客（含档案信息）")
-    @RequirePerm("face:search")
-    @OperLog(title = "人脸识别", businessType = "SELECT")
-    @PostMapping("/search")
-    public Result<List<Map<String, Object>>> search(@RequestPart("file") MultipartFile file) throws IOException {
-        String image = readImage(file);
-        faceClient.ensureGroup();
-        List<Map<String, Object>> candidates = faceClient.searchFace(image);
-
-        // 合并游客档案信息（黑名单标记等），并把命中最高的记录落库
-        List<Map<String, Object>> merged = new ArrayList<>();
-        for (Map<String, Object> c : candidates) {
-            Map<String, Object> item = new LinkedHashMap<>(c);
-            String personId = (String) c.get("personId");
-            Tourist tourist = touristMapper.selectOne(Wrappers.<Tourist>lambdaQuery()
-                    .eq(Tourist::getTouristNo, personId).last("LIMIT 1"));
-            if (tourist != null) {
-                item.put("touristId", tourist.getId());
-                item.put("phone", maskPhone(tourist.getPhone()));
-                item.put("memberLevel", tourist.getMemberLevel());
-                item.put("isBlacklist", tourist.getIsBlacklist());
-                item.put("blacklistReason", tourist.getBlacklistReason());
-                item.put("status", tourist.getStatus());
-            }
-            merged.add(item);
-        }
-
-        if (!merged.isEmpty()) {
-            Map<String, Object> best = merged.get(0);
-            FaceRecord record = new FaceRecord();
-            record.setRecordType("SEARCH");
-            record.setTouristId(best.get("touristId") == null ? null : Long.valueOf(best.get("touristId").toString()));
-            record.setTouristNo((String) best.get("personId"));
-            record.setTouristName((String) best.get("personName"));
-            record.setConfidence(toDecimal(best.get("confidence")));
-            record.setDetail("命中 " + merged.size() + " 个候选，最高相似度 " + best.get("confidence"));
-            record.setOperatorId(UserContext.getUserId());
-            faceRecordMapper.insert(record);
-        }
-        return Result.success(merged);
-    }
-
-    /* ==================== 人脸比对（1:1） ==================== */
-
-    @Operation(summary = "人脸比对", description = "上传两张照片计算 1:1 相似度（0~100），常用于人证核验")
-    @RequirePerm("face:search")
-    @OperLog(title = "人脸识别", businessType = "SELECT")
-    @PostMapping("/compare")
-    public Result<Map<String, Object>> compare(@RequestPart("fileA") MultipartFile fileA,
-                                               @RequestPart("fileB") MultipartFile fileB) throws IOException {
-        Double score = faceClient.compareFace(readImage(fileA), readImage(fileB));
-
-        Map<String, Object> out = new LinkedHashMap<>();
-        out.put("score", score);
-        out.put("conclusion", score >= 80 ? "高度相似，判定为同一人"
-                : score >= 60 ? "中度相似，建议人工复核" : "相似度较低，判定为不同人");
-
-        FaceRecord record = new FaceRecord();
-        record.setRecordType("COMPARE");
-        record.setConfidence(BigDecimal.valueOf(score).setScale(2, java.math.RoundingMode.HALF_UP));
-        record.setDetail("1:1 比对相似度 " + score);
-        record.setOperatorId(UserContext.getUserId());
-        faceRecordMapper.insert(record);
-        return Result.success(out);
-    }
-
-    /* ==================== 人脸测试（检测分析） ==================== */
-
-    @Operation(summary = "人脸检测测试", description = "检测照片中的人脸并分析属性：性别 / 年龄 / 表情 / 眼镜 / 口罩 / 质量分")
-    @RequirePerm("face:detect")
-    @OperLog(title = "人脸识别", businessType = "SELECT")
-    @PostMapping("/detect")
-    public Result<List<Map<String, Object>>> detect(@RequestPart("file") MultipartFile file) throws IOException {
-        List<Map<String, Object>> faces = faceClient.detectFace(readImage(file));
-
-        FaceRecord record = new FaceRecord();
-        record.setRecordType("DETECT");
-        record.setFaceCount(faces.size());
-        if (!faces.isEmpty()) {
-            Object first = faces.get(0);
-            record.setDetail("首张人脸：" + faces.get(0).entrySet().stream()
-                    .filter(e -> !"faceRect".equals(e.getKey()))
-                    .map(e -> e.getKey() + "=" + e.getValue())
-                    .collect(Collectors.joining(", ")));
-        } else {
-            record.setDetail("未检测到人脸");
-        }
-        record.setOperatorId(UserContext.getUserId());
-        faceRecordMapper.insert(record);
-        return Result.success(faces);
-    }
-
-    /* ==================== 识别记录 ==================== */
-
-    @Operation(summary = "识别记录分页", description = "本地 face_record 表，含注册 / 搜索 / 比对 / 检测全部历史")
+    @Operation(summary = "人脸操作记录分页", description = "本地 face_record 表，含注册 / 删除等全部历史")
     @RequirePerm("face:list")
     @GetMapping("/records")
     public Result<PageResult<FaceRecord>> records(@RequestParam(defaultValue = "1") Integer pageNum,
@@ -263,7 +183,7 @@ public class FaceController {
 
     /* ==================== 私有方法 ==================== */
 
-    /** 读取上传图片为 base64（不带 data URI 前缀），限制 5MB */
+    /** 读取上传图片为 base64（不带 data URI 前缀），限制 5MB 且必须是图片格式 */
     private String readImage(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             throw new BusinessException("请上传人脸照片");
@@ -271,19 +191,13 @@ public class FaceController {
         if (file.getSize() > 5 * 1024 * 1024) {
             throw new BusinessException("照片过大（限 5MB），请压缩后重试");
         }
-        return Base64.getEncoder().encodeToString(file.getBytes());
-    }
-
-    /** 手机号脱敏：138****1234 */
-    private String maskPhone(String phone) {
-        if (phone == null || phone.length() < 7) {
-            return phone;
+        String ext = file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")
+                ? file.getOriginalFilename()
+                        .substring(file.getOriginalFilename().lastIndexOf('.') + 1).toLowerCase()
+                : "";
+        if (!ALLOWED_IMAGE_EXT.contains(ext)) {
+            throw new BusinessException("仅支持 jpg / jpeg / png 格式的人脸照片");
         }
-        return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
-    }
-
-    private BigDecimal toDecimal(Object v) {
-        return v == null ? null : BigDecimal.valueOf(Double.parseDouble(v.toString()))
-                .setScale(2, java.math.RoundingMode.HALF_UP);
+        return Base64.getEncoder().encodeToString(file.getBytes());
     }
 }

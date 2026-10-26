@@ -3,6 +3,7 @@ package com.ikun.controller;
 import com.alibaba.excel.EasyExcel;
 import com.ikun.annotation.OperLog;
 import com.ikun.annotation.RequirePerm;
+import com.ikun.common.BusinessException;
 import com.ikun.common.PageResult;
 import com.ikun.common.Result;
 import com.ikun.dto.TouristBlacklistDTO;
@@ -26,6 +27,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 游客信息管理接口（对应原型：游客信息管理页面）
@@ -38,6 +40,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TouristController {
 
+    /** 导入文件允许的格式 */
+    private static final Set<String> ALLOWED_IMPORT_EXT = Set.of("xlsx", "xls");
+    /** 导入文件大小上限：10MB */
+    private static final long MAX_IMPORT_SIZE = 10 * 1024 * 1024L;
+
     private final TouristService touristService;
 
     @Operation(summary = "分页查询游客列表")
@@ -47,12 +54,11 @@ public class TouristController {
                                               @RequestParam(defaultValue = "10") Integer pageSize,
                                               @RequestParam(required = false) String keyword,
                                               @RequestParam(required = false) Long scenicId,
-                                              @RequestParam(required = false) String memberLevel,
                                               @RequestParam(required = false) Integer isBlacklist,
                                               @RequestParam(required = false) Integer realNameStatus,
                                               @RequestParam(required = false) Integer status) {
         return Result.success(touristService.pageQuery(pageNum, pageSize, keyword, scenicId,
-                memberLevel, isBlacklist, realNameStatus, status));
+                isBlacklist, realNameStatus, status));
     }
 
     @Operation(summary = "查询游客详情")
@@ -108,12 +114,11 @@ public class TouristController {
     public void export(HttpServletResponse response,
                        @RequestParam(required = false) String keyword,
                        @RequestParam(required = false) Long scenicId,
-                       @RequestParam(required = false) String memberLevel,
                        @RequestParam(required = false) Integer isBlacklist,
                        @RequestParam(required = false) Integer realNameStatus,
                        @RequestParam(required = false) Integer status)
             throws IOException {
-        List<TouristExportVO> list = touristService.listForExport(keyword, scenicId, memberLevel,
+        List<TouristExportVO> list = touristService.listForExport(keyword, scenicId,
                 isBlacklist, realNameStatus, status, 50000);
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -130,6 +135,20 @@ public class TouristController {
     @OperLog(title = "游客信息管理", businessType = "IMPORT")
     @PostMapping("/import")
     public Result<TouristImportResultVO> importExcel(@RequestPart("file") MultipartFile file) {
+        // 导入会逐行写库，不限制文件会让超大/非 Excel 文件把解析线程拖垮
+        if (file == null || file.isEmpty()) {
+            throw new BusinessException("请选择要导入的 Excel 文件");
+        }
+        if (file.getSize() > MAX_IMPORT_SIZE) {
+            throw new BusinessException("导入文件不能超过 10MB");
+        }
+        String ext = file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")
+                ? file.getOriginalFilename()
+                        .substring(file.getOriginalFilename().lastIndexOf('.') + 1).toLowerCase()
+                : "";
+        if (!ALLOWED_IMPORT_EXT.contains(ext)) {
+            throw new BusinessException("仅支持 .xlsx / .xls 格式的 Excel 文件");
+        }
         return Result.success("导入完成", touristService.importFromExcel(file));
     }
 }

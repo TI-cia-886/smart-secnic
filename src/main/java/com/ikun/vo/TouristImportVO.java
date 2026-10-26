@@ -51,21 +51,12 @@ public class TouristImportVO implements Serializable {
     /** MINI_PROGRAM / OTA / WINDOW */
     private String source;
 
-    @ExcelProperty(value = "会员等级", index = 5)
-    @ColumnWidth(12)
-    /** NORMAL / SILVER / GOLD / DIAMOND */
-    private String memberLevel;
-
-    @ExcelProperty(value = "积分", index = 6)
-    @ColumnWidth(8)
-    private Integer points;
-
-    @ExcelProperty(value = "状态", index = 7)
+    @ExcelProperty(value = "状态", index = 5)
     @ColumnWidth(8)
     /** 正常 / 禁用 */
     private String status;
 
-    @ExcelProperty(value = "备注", index = 8)
+    @ExcelProperty(value = "备注", index = 6)
     @ColumnWidth(24)
     private String remark;
 }

@@ -74,6 +74,9 @@ public class TicketOrderVO implements Serializable {
     @Schema(description = "游玩日期")
     private LocalDate playDate;
 
+    @Schema(description = "预约时段，如 08:00-10:00；空串表示全天票")
+    private String timeSlot;
+
     @ExcelProperty("订单状态")
     @ColumnWidth(12)
     @Schema(description = "订单状态中文描述")

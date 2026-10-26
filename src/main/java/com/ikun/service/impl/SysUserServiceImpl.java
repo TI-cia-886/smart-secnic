@@ -8,11 +8,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ikun.common.BusinessException;
 import com.ikun.common.PageResult;
 import com.ikun.common.ResultCode;
+import com.ikun.common.ScenicScope;
 import com.ikun.common.UserContext;
 import com.ikun.dto.SysUserDTO;
+import com.ikun.entity.Complaint;
 import com.ikun.entity.ScenicArea;
 import com.ikun.entity.SysRole;
 import com.ikun.entity.SysUser;
+import com.ikun.mapper.ComplaintMapper;
 import com.ikun.mapper.ScenicAreaMapper;
 import com.ikun.mapper.SysRoleMapper;
 import com.ikun.mapper.SysUserMapper;
@@ -20,6 +23,7 @@ import com.ikun.service.SysUserService;
 import com.ikun.util.PasswordUtil;
 import com.ikun.util.SensitiveUtil;
 import com.ikun.vo.SysUserVO;
+import com.ikun.vo.UserOptionVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,6 +46,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     private final SysRoleMapper sysRoleMapper;
     private final ScenicAreaMapper scenicAreaMapper;
+    private final ComplaintMapper complaintMapper;
 
     @Override
     public PageResult<SysUserVO> pageQuery(Integer pageNum, Integer pageSize, String keyword,
@@ -78,6 +83,26 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }).collect(Collectors.toList());
 
         return new PageResult<>(records, page.getTotal(), page.getCurrent(), page.getSize());
+    }
+
+    @Override
+    public List<UserOptionVO> handlerOptions() {
+        // 与账号分页不同：本方法服务工单转派等业务场景，景区隔离照常生效，
+        // 但不要求 system:user:list 权限，避免景区管理员打开工单页就报无权限
+        List<SysUser> users = this.list(Wrappers.<SysUser>lambdaQuery()
+                .select(SysUser::getId, SysUser::getUsername, SysUser::getRealName, SysUser::getRoleId)
+                .eq(SysUser::getStatus, 1)
+                .eq(ScenicScope.isRestricted(), SysUser::getScenicId, UserContext.getScenicId())
+                .orderByAsc(SysUser::getId));
+        Map<Long, String> roleNameMap = sysRoleMapper.selectList(null).stream()
+                .collect(Collectors.toMap(SysRole::getId, SysRole::getRoleName, (a, b) -> a));
+        return users.stream().map(user -> {
+            UserOptionVO vo = new UserOptionVO();
+            vo.setId(user.getId());
+            vo.setName(StringUtils.hasText(user.getRealName()) ? user.getRealName() : user.getUsername());
+            vo.setRoleName(roleNameMap.get(user.getRoleId()));
+            return vo;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -155,11 +180,23 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (Objects.equals(id, UserContext.getUserId())) {
             throw new BusinessException("不允许删除当前登录账号");
         }
+        // 账号是工单处理人：删除后未完结工单的 handler_id 悬空，工单详情取不到处理人、
+        // 也无法继续流转。必须先转派给他人再删除。
+        long handling = complaintMapper.selectCount(Wrappers.<Complaint>lambdaQuery()
+                .eq(Complaint::getHandlerId, id)
+                .in(Complaint::getStatus, List.of("PENDING", "PROCESSING")));
+        if (handling > 0) {
+            throw new BusinessException("该账号名下还有 " + handling + " 条未完结工单，请先转派后再删除");
+        }
         this.removeById(id);
     }
 
     @Override
     public void changeStatus(Long id, Integer status) {
+        // status 直接进 UPDATE，不校验的话任意整数都会写进状态列
+        if (status == null || (status != 0 && status != 1)) {
+            throw new BusinessException("状态值不合法，只能是 0（禁用）或 1（启用）");
+        }
         if (Objects.equals(id, UserContext.getUserId())) {
             throw new BusinessException("不允许修改当前登录账号状态");
         }

@@ -35,12 +35,6 @@ public class AppLoginVO implements Serializable {
     @Schema(description = "手机号（已脱敏）")
     private String phone;
 
-    @Schema(description = "会员等级")
-    private String memberLevel;
-
-    @Schema(description = "积分")
-    private Integer points;
-
     @Schema(description = "头像")
     private String avatar;
 

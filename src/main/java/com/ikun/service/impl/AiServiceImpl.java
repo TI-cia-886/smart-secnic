@@ -72,6 +72,10 @@ public class AiServiceImpl implements AiService {
     private static final String LOG_SUCCESS = "SUCCESS";
     private static final String LOG_FAIL = "FAIL";
 
+    /** 知识库分类白名单（与种子数据一致：COMMON/TICKET/ROUTE/SERVICE/SAFETY） */
+    private static final Set<String> KNOWLEDGE_CATEGORIES =
+            Set.of("COMMON", "TICKET", "ROUTE", "SERVICE", "SAFETY");
+
     private final AiKnowledgeMapper aiKnowledgeMapper;
     private final AiLogMapper aiLogMapper;
     private final AiChatMapper aiChatMapper;
@@ -252,10 +256,11 @@ public class AiServiceImpl implements AiService {
                 .eq(AiChat::getRole, "user"));
         vo.setChatCount(aiChatMapper.selectCount(Wrappers.<AiChat>lambdaQuery()
                 .eq(scopeScenicId != null, AiChat::getScenicId, scopeScenicId)));
-        // 知识库命中率 = 累计命中次数 / 累计提问次数，直接反映知识库覆盖得够不够
+        // 知识库命中率 = 累计命中次数 / 累计提问次数，直接反映知识库覆盖得够不够；
+        // 分母取两者较大值兜底：知识条目可能带预置的演示命中数，避免命中率算出超过 100% 的荒谬值
         long hitTotal = knowledgeList.stream()
                 .mapToLong(k -> k.getHitCount() == null ? 0L : k.getHitCount()).sum();
-        vo.setKnowledgeHitRate(rate(hitTotal, questionCount == null ? 0L : questionCount));
+        vo.setKnowledgeHitRate(rate(hitTotal, Math.max(questionCount == null ? 0L : questionCount, hitTotal)));
 
         List<StatItemVO> moduleItems = new ArrayList<>();
         moduleCount.forEach((name, value) -> moduleItems.add(new StatItemVO(name, value)));
@@ -496,8 +501,23 @@ public class AiServiceImpl implements AiService {
         if (!StringUtils.hasText(knowledge.getQuestion())) {
             throw new BusinessException("标准问题不能为空");
         }
+        if (knowledge.getQuestion().length() > 200) {
+            throw new BusinessException("标准问题不能超过 200 个字符");
+        }
         if (!StringUtils.hasText(knowledge.getAnswer())) {
             throw new BusinessException("标准答案不能为空");
+        }
+        if (knowledge.getAnswer().length() > 2000) {
+            throw new BusinessException("标准答案不能超过 2000 个字符");
+        }
+        // category 决定知识检索的分组，status 决定是否参与召回，
+        // 二者都是字典字段，任意字符串会让检索分组失效
+        if (StringUtils.hasText(knowledge.getCategory())
+                && !KNOWLEDGE_CATEGORIES.contains(knowledge.getCategory())) {
+            throw new BusinessException("知识分类只能是 " + String.join("/", KNOWLEDGE_CATEGORIES));
+        }
+        if (knowledge.getStatus() != null && knowledge.getStatus() != 0 && knowledge.getStatus() != 1) {
+            throw new BusinessException("知识状态只能是 0（停用）或 1（启用）");
         }
     }
 

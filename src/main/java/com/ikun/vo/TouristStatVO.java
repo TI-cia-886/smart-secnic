@@ -35,9 +35,6 @@ public class TouristStatVO implements Serializable {
     @Schema(description = "注册趋势（按日）")
     private List<TrendItemVO> trend = new ArrayList<>();
 
-    @Schema(description = "会员等级分布")
-    private List<StatItemVO> memberLevelDist = new ArrayList<>();
-
     @Schema(description = "注册来源分布")
     private List<StatItemVO> sourceDist = new ArrayList<>();
 

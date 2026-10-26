@@ -19,10 +19,13 @@ import com.ikun.mapper.TicketStockMapper;
 import com.ikun.mapper.TicketTypeMapper;
 import com.ikun.mapper.TouristMapper;
 import com.ikun.service.AppOrderService;
+import com.ikun.util.CodeGenerator;
 import com.ikun.util.SensitiveUtil;
+import com.ikun.util.TimeSlotUtil;
 import com.ikun.vo.TicketOrderVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -73,6 +76,7 @@ public class AppOrderServiceImpl implements AppOrderService {
     private final TicketStockMapper ticketStockMapper;
     private final TouristMapper touristMapper;
     private final ScenicAreaMapper scenicAreaMapper;
+    private final CodeGenerator codeGenerator;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -84,6 +88,10 @@ public class AppOrderServiceImpl implements AppOrderService {
         }
         if (tourist.getIsBlacklist() != null && tourist.getIsBlacklist() == 1) {
             throw new BusinessException("账号已被列入黑名单，暂无法购票");
+        }
+        // 实名校验：前端有拦截，但接口层必须再校验一次，防止绕过（实名制入园要求）
+        if (tourist.getRealNameStatus() == null || tourist.getRealNameStatus() != 1) {
+            throw new BusinessException("请先完成实名认证后再购票");
         }
 
         TicketType type = ticketTypeMapper.selectById(dto.getTicketTypeId());
@@ -106,12 +114,24 @@ public class AppOrderServiceImpl implements AppOrderService {
             throw new BusinessException("单笔订单最多购买 " + MAX_QUANTITY_PER_ORDER + " 张门票");
         }
 
-        ensureStock(type, playDate);
+        // 分时预约：票种配置了时段就必须选择时段，且只能选票种开放的时段
+        List<String> configuredSlots = TimeSlotUtil.parse(type.getTimeSlots());
+        String timeSlot = TimeSlotUtil.normalize(dto.getTimeSlot());
+        if (!configuredSlots.isEmpty() && timeSlot.isEmpty()) {
+            throw new BusinessException("请选择预约时段");
+        }
+        if (!TimeSlotUtil.matches(configuredSlots, timeSlot)) {
+            throw new BusinessException("该时段不可预约，请选择开放时段：" + String.join("、", configuredSlots));
+        }
+
+        ensureStock(type, playDate, configuredSlots, timeSlot);
         // 条件更新一步完成「判断余量 + 扣减」，0 行即库存不足，避免先查后改导致超卖
-        int locked = ticketStockMapper.lockStock(type.getId(), playDate, quantity);
+        int locked = ticketStockMapper.lockStock(type.getId(), playDate, timeSlot, quantity);
         if (locked == 0) {
             throw new BusinessException(ResultCode.TICKET_STOCK_NOT_ENOUGH,
-                    "该日期门票库存不足，请选择其他日期");
+                    configuredSlots.isEmpty()
+                            ? "该日期门票库存不足，请选择其他日期"
+                            : "该时段门票库存不足，请选择其他时段或日期");
         }
 
         String orderNo = generateOrderNo();
@@ -126,6 +146,7 @@ public class AppOrderServiceImpl implements AppOrderService {
         order.setUnitPrice(unitPrice.setScale(2, RoundingMode.HALF_UP));
         order.setTotalAmount(unitPrice.multiply(BigDecimal.valueOf(quantity)).setScale(2, RoundingMode.HALF_UP));
         order.setPlayDate(playDate);
+        order.setTimeSlot(timeSlot);
         order.setStatus(STATUS_PENDING_PAY);
         order.setChannel(CHANNEL_MINI_PROGRAM);
         order.setExpireTime(LocalDateTime.now().plusMinutes(PAY_EXPIRE_MINUTES));
@@ -157,7 +178,8 @@ public class AppOrderServiceImpl implements AppOrderService {
         update.setPayTime(LocalDateTime.now());
         ticketOrderMapper.updateById(update);
         // 锁定库存转为已售
-        ticketStockMapper.confirmStock(order.getTicketTypeId(), order.getPlayDate(), order.getQuantity());
+        ticketStockMapper.confirmStock(order.getTicketTypeId(), order.getPlayDate(),
+                TimeSlotUtil.normalize(order.getTimeSlot()), order.getQuantity());
 
         order.setStatus(STATUS_PAID);
         order.setPayTime(update.getPayTime());
@@ -213,7 +235,8 @@ public class AppOrderServiceImpl implements AppOrderService {
         update.setStatus("CANCELLED");
         ticketOrderMapper.updateById(update);
         // 取消订单必须释放锁定库存，否则这些票会一直被占用而卖不出去
-        ticketStockMapper.releaseStock(order.getTicketTypeId(), order.getPlayDate(), order.getQuantity());
+        ticketStockMapper.releaseStock(order.getTicketTypeId(), order.getPlayDate(),
+                TimeSlotUtil.normalize(order.getTimeSlot()), order.getQuantity());
         log.info("小程序取消订单：orderNo={}", order.getOrderNo());
     }
 
@@ -238,36 +261,72 @@ public class AppOrderServiceImpl implements AppOrderService {
     }
 
     /**
-     * 确保目标日期的库存记录存在。
+     * 确保目标日期（及目标时段）的库存记录存在。
      *
      * <p>{@code ticket_type.stock} 只是每日库存默认值，真正按天扣减依赖 {@code ticket_stock}。
-     * 首次预订某一天时按票种默认库存初始化一条记录。</p>
+     * 首次预订某一天时初始化：
+     * 不分时票种建 1 条全天记录；分时票种把每日库存按时段均分，为每个时段各建 1 条。</p>
+     *
+     * <p>初始化是幂等的：并发下只会有一条插入成功，另一条触发唯一键冲突时
+     * 由调用方直接走条件更新即可，不会重复建库存导致超卖。</p>
      */
-    private void ensureStock(TicketType type, LocalDate playDate) {
-        TicketStock stock = ticketStockMapper.selectOne(Wrappers.<TicketStock>lambdaQuery()
+    private void ensureStock(TicketType type, LocalDate playDate, List<String> slots, String timeSlot) {
+        List<String> targets = slots.isEmpty() ? List.of(TimeSlotUtil.ALL_DAY) : slots;
+        for (int i = 0; i < targets.size(); i++) {
+            String slot = targets.get(i);
+            TicketStock exist = ticketStockMapper.selectOne(Wrappers.<TicketStock>lambdaQuery()
+                    .eq(TicketStock::getTicketTypeId, type.getId())
+                    .eq(TicketStock::getStockDate, playDate)
+                    .eq(TicketStock::getTimeSlot, slot)
+                    .last("LIMIT 1"));
+            if (exist != null) {
+                continue;
+            }
+            int totalStock = slots.isEmpty()
+                    ? (type.getStock() == null ? 0 : type.getStock())
+                    : TimeSlotUtil.perSlotStock(type.getStock(), slots.size(), i);
+            TicketStock created = new TicketStock();
+            created.setScenicId(type.getScenicId());
+            created.setTicketTypeId(type.getId());
+            created.setStockDate(playDate);
+            created.setTimeSlot(slot);
+            created.setTotalStock(totalStock);
+            created.setSoldCount(0);
+            created.setLockedCount(0);
+            created.setStatus(1);
+            try {
+                ticketStockMapper.insert(created);
+            } catch (DuplicateKeyException ignore) {
+                // 并发初始化撞唯一键，说明已存在，忽略即可
+            }
+        }
+        // 兜底：极端情况下目标时段记录仍不存在（例如票种刚被改成分时，旧记录是全天行），补一条
+        TicketStock target = ticketStockMapper.selectOne(Wrappers.<TicketStock>lambdaQuery()
                 .eq(TicketStock::getTicketTypeId, type.getId())
                 .eq(TicketStock::getStockDate, playDate)
+                .eq(TicketStock::getTimeSlot, timeSlot)
                 .last("LIMIT 1"));
-        if (stock != null) {
-            return;
+        if (target == null) {
+            TicketStock created = new TicketStock();
+            created.setScenicId(type.getScenicId());
+            created.setTicketTypeId(type.getId());
+            created.setStockDate(playDate);
+            created.setTimeSlot(timeSlot);
+            created.setTotalStock(type.getStock() == null ? 0 : type.getStock());
+            created.setSoldCount(0);
+            created.setLockedCount(0);
+            created.setStatus(1);
+            try {
+                ticketStockMapper.insert(created);
+            } catch (DuplicateKeyException ignore) {
+                // 同上
+            }
         }
-        TicketStock created = new TicketStock();
-        created.setScenicId(type.getScenicId());
-        created.setTicketTypeId(type.getId());
-        created.setStockDate(playDate);
-        created.setTotalStock(type.getStock() == null ? 0 : type.getStock());
-        created.setSoldCount(0);
-        created.setLockedCount(0);
-        created.setStatus(1);
-        ticketStockMapper.insert(created);
     }
 
-    /** 订单号：ORD + 日期 + 当日序号，如 ORD20250910001 */
+    /** 订单号：统一走 CodeGenerator，形如 ORD202510190001 */
     private String generateOrderNo() {
-        Long todayCount = ticketOrderMapper.selectCount(Wrappers.<TicketOrder>lambdaQuery()
-                .ge(TicketOrder::getCreateTime, LocalDate.now().atStartOfDay()));
-        long seq = (todayCount == null ? 0L : todayCount) + 1L;
-        return "ORD" + LocalDate.now().format(ORDER_NO_DATE) + String.format("%03d", seq);
+        return codeGenerator.daily(CodeGenerator.PREFIX_ORDER);
     }
 
     private String touristName(Long touristId) {
@@ -318,6 +377,7 @@ public class AppOrderServiceImpl implements AppOrderService {
         vo.setUnitPrice(order.getUnitPrice());
         vo.setTotalAmount(order.getTotalAmount());
         vo.setPlayDate(order.getPlayDate());
+        vo.setTimeSlot(order.getTimeSlot());
         vo.setStatus(order.getStatus());
         vo.setStatusText(TicketOrderServiceImpl.statusText(order.getStatus()));
         vo.setChannel(order.getChannel());

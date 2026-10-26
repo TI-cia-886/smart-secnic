@@ -32,7 +32,7 @@ public class AppComplaintController {
 
     private final AppComplaintService appComplaintService;
 
-    @Operation(summary = "提交工单", description = "提交时自动做情感分析，负面工单自动升级为紧急")
+    @Operation(summary = "提交工单", description = "提交时自动做情感分析，供管理端按情感倾向排序处理")
     @PostMapping("/submit")
     public Result<Void> submit(@Valid @RequestBody AppComplaintDTO dto) {
         appComplaintService.submit(dto);

@@ -10,12 +10,13 @@ import com.ikun.common.ScenicScope;
 import com.ikun.common.UserContext;
 import com.ikun.dto.RefundAuditDTO;
 import com.ikun.entity.CheckinRecord;
+import com.ikun.entity.PassengerFlow;
 import com.ikun.entity.ScenicArea;
 import com.ikun.entity.SysUser;
 import com.ikun.entity.TicketOrder;
-import com.ikun.entity.TicketStock;
 import com.ikun.entity.Tourist;
 import com.ikun.mapper.CheckinRecordMapper;
+import com.ikun.mapper.PassengerFlowMapper;
 import com.ikun.mapper.ScenicAreaMapper;
 import com.ikun.mapper.SysUserMapper;
 import com.ikun.mapper.TicketOrderMapper;
@@ -23,6 +24,7 @@ import com.ikun.mapper.TicketStockMapper;
 import com.ikun.mapper.TouristMapper;
 import com.ikun.service.TicketOrderService;
 import com.ikun.util.SensitiveUtil;
+import com.ikun.util.TimeSlotUtil;
 import com.ikun.vo.OrderStatVO;
 import com.ikun.vo.StatItemVO;
 import com.ikun.vo.TicketOrderVO;
@@ -76,8 +78,15 @@ public class TicketOrderServiceImpl extends ServiceImpl<TicketOrderMapper, Ticke
     private static final int QR_SIGN_LENGTH = 16;
     private static final int DEFAULT_RANGE_DAYS = 30;
 
+    /** 统一离园时刻：当日 18:00 后核销只记入园流水，在园人数不再增加（默认 6 点后出园） */
+    private static final int LEAVE_HOUR = 18;
+    /** 客流预警阈值（饱和度百分比），与 PassengerFlowServiceImpl 保持同一口径 */
+    private static final double FLOW_WARNING_THRESHOLD = 70D;
+    private static final double FLOW_DANGER_THRESHOLD = 90D;
+
     private final TicketStockMapper ticketStockMapper;
     private final CheckinRecordMapper checkinRecordMapper;
+    private final PassengerFlowMapper passengerFlowMapper;
     private final ScenicAreaMapper scenicAreaMapper;
     private final TouristMapper touristMapper;
     private final SysUserMapper sysUserMapper;
@@ -157,8 +166,77 @@ public class TicketOrderServiceImpl extends ServiceImpl<TicketOrderMapper, Ticke
         updateById(update);
 
         writeCheckinRecord(order, gate, verifyType, "SUCCESS", null);
+        // 业务闭环：核销即入园，同步滚动当日客流时段表，
+        // 驱动客流概览、客流报表、游客端首页实时人数联动
+        applyFlow(order);
         log.info("订单核销成功：orderNo={}，gate={}，verifyType={}，operatorId={}",
                 order.getOrderNo(), gate, verifyType, UserContext.getUserId());
+    }
+
+    /**
+     * 核销后滚动当日客流统计：入园人数、在园人数按小时累计到 passenger_flow。
+     *
+     * <p>统计口径：核销即入园；当日 18:00（统一离园时刻）之后的核销只记入园流水、
+     * 不再增加在园人数（视为当天闭园前离园）。写入失败只告警不回滚，核销主流程不受影响。</p>
+     */
+    private void applyFlow(TicketOrder order) {
+        try {
+            LocalDate today = LocalDate.now();
+            LocalDateTime now = LocalDateTime.now();
+            int hour = now.getHour();
+            boolean afterLeave = hour >= LEAVE_HOUR;
+            int qty = order.getQuantity() == null ? 0 : order.getQuantity();
+
+            PassengerFlow row = passengerFlowMapper.selectOne(Wrappers.<PassengerFlow>lambdaQuery()
+                    .eq(PassengerFlow::getScenicId, order.getScenicId())
+                    .eq(PassengerFlow::getStatDate, today)
+                    .eq(PassengerFlow::getStatHour, hour)
+                    .last("LIMIT 1"));
+            if (row == null) {
+                PassengerFlow insert = new PassengerFlow();
+                insert.setScenicId(order.getScenicId());
+                insert.setStatDate(today);
+                insert.setStatHour(hour);
+                insert.setEnterCount(qty);
+                // 离园数统一由 18 点闭园行承载（见 PassengerFlowServiceImpl#closeDayAfterLeave），
+                // 这里只累计入园流水，避免离园数重复统计
+                insert.setLeaveCount(0);
+                insert.setCurrentCount(afterLeave ? 0 : qty);
+                int capacity = defaultCapacity(order.getScenicId());
+                insert.setCapacity(capacity);
+                insert.setWarningLevel(flowLevel(afterLeave ? 0 : qty, capacity));
+                passengerFlowMapper.insert(insert);
+            } else {
+                PassengerFlow update = new PassengerFlow();
+                update.setId(row.getId());
+                update.setEnterCount(nz(row.getEnterCount()) + qty);
+                update.setCurrentCount(afterLeave ? 0 : nz(row.getCurrentCount()) + qty);
+                passengerFlowMapper.updateById(update);
+            }
+        } catch (Exception e) {
+            log.warn("核销后滚动客流统计失败（不影响核销）：orderNo={}", order.getOrderNo(), e);
+        }
+    }
+
+    /** 景区日承载量作为时段容量口径；未配置时按 0 处理（饱和度按 0 计，不打扰预警） */
+    private int defaultCapacity(Long scenicId) {
+        ScenicArea area = scenicAreaMapper.selectById(scenicId);
+        return area == null || area.getDailyCapacity() == null ? 0 : area.getDailyCapacity();
+    }
+
+    private String flowLevel(int current, int capacity) {
+        if (capacity <= 0) {
+            return "NORMAL";
+        }
+        double rate = current * 100.0 / capacity;
+        if (rate >= FLOW_DANGER_THRESHOLD) {
+            return "DANGER";
+        }
+        return rate >= FLOW_WARNING_THRESHOLD ? "WARNING" : "NORMAL";
+    }
+
+    private int nz(Integer v) {
+        return v == null ? 0 : v;
     }
 
     /**
@@ -309,16 +387,12 @@ public class TicketOrderServiceImpl extends ServiceImpl<TicketOrderMapper, Ticke
         update.setRefundAuditRemark(StringUtils.hasText(remark) ? remark : "审核通过");
         updateById(update);
 
-        // 回滚库存必须用「条件更新 + 下限判断」，否则并发退款会把已售数量减成负数
-        TicketStock stock = ticketStockMapper.selectOne(Wrappers.<TicketStock>lambdaQuery()
-                .eq(TicketStock::getTicketTypeId, order.getTicketTypeId())
-                .eq(TicketStock::getStockDate, order.getPlayDate())
-                .last("LIMIT 1"));
-        if (stock != null && order.getQuantity() != null && order.getQuantity() > 0) {
-            ticketStockMapper.update(null, Wrappers.<TicketStock>lambdaUpdate()
-                    .eq(TicketStock::getId, stock.getId())
-                    .ge(TicketStock::getSoldCount, order.getQuantity())
-                    .setSql("sold_count = sold_count - " + order.getQuantity()));
+        // 退款成功后这张票要重新变回可售，不回滚会出现「票已退钱却永远买不到」。
+        // 走 rollbackSold 而不是「先查再改」：SQL 里用 GREATEST 兜底防负数，且天然带上时段条件——
+        // 分时票若只按 (票种,日期) 查会命中任意时段的行，把别的时段库存扣错。
+        if (order.getQuantity() != null && order.getQuantity() > 0) {
+            ticketStockMapper.rollbackSold(order.getTicketTypeId(), order.getPlayDate(),
+                    TimeSlotUtil.normalize(order.getTimeSlot()), order.getQuantity());
         }
         log.info("退票审核通过：orderNo={}，auditBy={}", order.getOrderNo(), UserContext.getUserId());
     }
@@ -417,6 +491,7 @@ public class TicketOrderServiceImpl extends ServiceImpl<TicketOrderMapper, Ticke
             vo.setUnitPrice(order.getUnitPrice());
             vo.setTotalAmount(order.getTotalAmount());
             vo.setPlayDate(order.getPlayDate());
+            vo.setTimeSlot(order.getTimeSlot());
             vo.setStatus(order.getStatus());
             vo.setStatusText(statusText(order.getStatus()));
             vo.setChannel(order.getChannel());

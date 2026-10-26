@@ -21,13 +21,13 @@ import java.util.List;
 public interface TouristService {
 
     PageResult<TouristVO> pageQuery(Integer pageNum, Integer pageSize, String keyword, Long scenicId,
-                                    String memberLevel, Integer isBlacklist, Integer realNameStatus,
+                                    Integer isBlacklist, Integer realNameStatus,
                                     Integer status);
 
     /** 游客详情，附带累加订单数与工单数 */
     TouristVO getDetail(Long id);
 
-    /** 编辑游客资料：仅允许修改备注、会员等级、状态 */
+    /** 编辑游客资料：仅允许修改备注、状态 */
     void updateTourist(Tourist tourist);
 
     /** 加入黑名单 */
@@ -46,9 +46,9 @@ public interface TouristService {
 
     /**
      * 按查询条件拉导出列表，最多 maxRows 条（默认 5000）。
-     * 返回的对象是 Excel 友好的 VO（手机号脱敏、会员等级中文等）。
+     * 返回的对象是 Excel 友好的 VO（手机号脱敏等）。
      */
-    List<TouristExportVO> listForExport(String keyword, Long scenicId, String memberLevel,
+    List<TouristExportVO> listForExport(String keyword, Long scenicId,
                                         Integer isBlacklist, Integer realNameStatus, Integer status,
                                         int maxRows);
 

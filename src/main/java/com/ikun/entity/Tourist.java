@@ -51,14 +51,11 @@ public class Tourist implements Serializable {
     /** 注册来源：MINI_PROGRAM/OTA/WINDOW */
     private String source;
 
-    /** 会员等级：NORMAL/SILVER/GOLD/DIAMOND */
-    private String memberLevel;
-
-    /** 积分 */
-    private Integer points;
-
     /** 实名状态：1已实名 0未实名 */
     private Integer realNameStatus;
+
+    /** 人脸录入状态：1已录入 0未录入（录入后参与景区人脸库，入园可刷脸核验） */
+    private Integer faceStatus;
 
     /** 是否黑名单：1是 0否 */
     private Integer isBlacklist;

@@ -3,6 +3,7 @@ package com.ikun.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ikun.common.AppUserContext;
 import com.ikun.common.BusinessException;
+import com.ikun.config.ThreadPoolConfig;
 import com.ikun.dto.AiChatDTO;
 import com.ikun.entity.Announcement;
 import com.ikun.entity.ParkingLot;
@@ -10,6 +11,7 @@ import com.ikun.entity.PassengerFlow;
 import com.ikun.entity.ScenicArea;
 import com.ikun.entity.ScenicSpot;
 import com.ikun.entity.TicketOrder;
+import com.ikun.entity.TicketStock;
 import com.ikun.entity.TicketType;
 import com.ikun.mapper.AnnouncementMapper;
 import com.ikun.mapper.ParkingLotMapper;
@@ -17,15 +19,21 @@ import com.ikun.mapper.PassengerFlowMapper;
 import com.ikun.mapper.ScenicAreaMapper;
 import com.ikun.mapper.ScenicSpotMapper;
 import com.ikun.mapper.TicketOrderMapper;
+import com.ikun.mapper.TicketStockMapper;
 import com.ikun.mapper.TicketTypeMapper;
 import com.ikun.service.AiService;
+import com.ikun.service.AppCacheService;
 import com.ikun.service.AppScenicService;
+import com.ikun.util.TimeSlotUtil;
 import com.ikun.vo.AiChatReplyVO;
 import com.ikun.vo.AppHomeVO;
 import com.ikun.vo.AppRouteSpotVO;
 import com.ikun.vo.AppRouteVO;
+import com.ikun.vo.TicketAvailabilityVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -35,6 +43,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -70,11 +84,31 @@ public class AppScenicServiceImpl implements AppScenicService {
     private final ParkingLotMapper parkingLotMapper;
     private final PassengerFlowMapper passengerFlowMapper;
     private final TicketOrderMapper ticketOrderMapper;
+    private final TicketStockMapper ticketStockMapper;
     private final AiService aiService;
+    private final AppCacheService appCacheService;
+    /** AI 外部调用专用线程池，与业务线程隔离 */
+    @Qualifier("aiExecutor")
+    private final ThreadPoolTaskExecutor aiExecutor;
 
     @Override
     public AppHomeVO home(Long scenicId) {
         Long target = resolveScenic(scenicId);
+        Long touristId = AppUserContext.getTouristId();
+        // 登录用户的结果里含「我的待支付订单数」这类个性化数据，不能共享缓存；
+        // 未登录游客占了首页请求的绝大多数，缓存这部分就足以显著降低数据库压力。
+        if (touristId != null) {
+            return buildHome(target, touristId);
+        }
+        AppHomeVO cached = appCacheService.query(appCacheService.homeKey(target),
+                AppCacheService.TTL_HOME, () -> buildHome(target, null));
+        if (cached == null) {
+            throw new BusinessException("景区不存在");
+        }
+        return cached;
+    }
+
+    private AppHomeVO buildHome(Long target, Long touristId) {
         ScenicArea area = scenicAreaMapper.selectById(target);
         if (area == null) {
             throw new BusinessException("景区不存在");
@@ -113,7 +147,6 @@ public class AppScenicServiceImpl implements AppScenicService {
                 .orderByAsc(ParkingLot::getId)));
 
         // 未登录游客返回 0；登录游客展示待支付数量，提醒其尽快完成支付
-        Long touristId = AppUserContext.getTouristId();
         vo.setPendingOrderCount(touristId == null ? 0L : ticketOrderMapper.selectCount(
                 Wrappers.<TicketOrder>lambdaQuery()
                         .eq(TicketOrder::getTouristId, touristId)
@@ -123,13 +156,16 @@ public class AppScenicServiceImpl implements AppScenicService {
 
     @Override
     public List<ScenicArea> listScenic(String keyword, String level, String city) {
-        return scenicAreaMapper.selectList(Wrappers.<ScenicArea>lambdaQuery()
-                .eq(ScenicArea::getStatus, SCENIC_STATUS_ENABLE)
-                .like(StringUtils.hasText(keyword), ScenicArea::getScenicName, keyword)
-                .eq(StringUtils.hasText(level), ScenicArea::getLevel, level)
-                .eq(StringUtils.hasText(city), ScenicArea::getCity, city)
-                .orderByDesc(ScenicArea::getLevel)
-                .orderByAsc(ScenicArea::getId));
+        // 景区基础信息读多写少，缓存后在管理端改数据时由 AppCacheService.evictScenic 清除
+        return appCacheService.query(appCacheService.scenicListKey(keyword, level, city),
+                AppCacheService.TTL_SCENIC_LIST, () -> scenicAreaMapper.selectList(
+                        Wrappers.<ScenicArea>lambdaQuery()
+                                .eq(ScenicArea::getStatus, SCENIC_STATUS_ENABLE)
+                                .like(StringUtils.hasText(keyword), ScenicArea::getScenicName, keyword)
+                                .eq(StringUtils.hasText(level), ScenicArea::getLevel, level)
+                                .eq(StringUtils.hasText(city), ScenicArea::getCity, city)
+                                .orderByDesc(ScenicArea::getLevel)
+                                .orderByAsc(ScenicArea::getId)));
     }
 
     @Override
@@ -163,10 +199,12 @@ public class AppScenicServiceImpl implements AppScenicService {
     @Override
     public List<TicketType> listTickets(Long scenicId) {
         Long target = resolveScenic(scenicId);
-        return ticketTypeMapper.selectList(Wrappers.<TicketType>lambdaQuery()
-                .eq(TicketType::getScenicId, target)
-                .eq(TicketType::getStatus, 1)
-                .orderByAsc(TicketType::getPrice));
+        return appCacheService.query(appCacheService.ticketsKey(target),
+                AppCacheService.TTL_TICKETS, () -> ticketTypeMapper.selectList(
+                        Wrappers.<TicketType>lambdaQuery()
+                                .eq(TicketType::getScenicId, target)
+                                .eq(TicketType::getStatus, 1)
+                                .orderByAsc(TicketType::getPrice)));
     }
 
     @Override
@@ -176,6 +214,53 @@ public class AppScenicServiceImpl implements AppScenicService {
             throw new BusinessException("票种不存在");
         }
         return type;
+    }
+
+    @Override
+    public TicketAvailabilityVO ticketAvailability(Long ticketTypeId, LocalDate playDate) {
+        TicketType type = ticketTypeId == null ? null : ticketTypeMapper.selectById(ticketTypeId);
+        if (type == null) {
+            throw new BusinessException("票种不存在");
+        }
+        LocalDate date = playDate == null ? LocalDate.now() : playDate;
+
+        List<String> slots = TimeSlotUtil.parse(type.getTimeSlots());
+        List<String> targets = slots.isEmpty() ? List.of(TimeSlotUtil.ALL_DAY) : slots;
+
+        Map<String, TicketStock> bySlot = ticketStockMapper.selectList(Wrappers.<TicketStock>lambdaQuery()
+                        .eq(TicketStock::getTicketTypeId, type.getId())
+                        .eq(TicketStock::getStockDate, date)
+                        .in(TicketStock::getTimeSlot, targets))
+                .stream()
+                .collect(Collectors.toMap(TicketStock::getTimeSlot, Function.identity(), (a, b) -> a));
+
+        List<TicketAvailabilityVO.SlotStockVO> items = new ArrayList<>(targets.size());
+        for (int i = 0; i < targets.size(); i++) {
+            String slot = targets.get(i);
+            TicketStock stock = bySlot.get(slot);
+            // 该时段还没人订过（库存行未建）时，按票种默认库存推导，避免页面误显示 0 张
+            int total = stock != null && stock.getTotalStock() != null
+                    ? stock.getTotalStock()
+                    : (slots.isEmpty()
+                            ? (type.getStock() == null ? 0 : type.getStock())
+                            : TimeSlotUtil.perSlotStock(type.getStock(), slots.size(), i));
+            int remain = stock == null ? total : stock.remain();
+
+            TicketAvailabilityVO.SlotStockVO item = new TicketAvailabilityVO.SlotStockVO();
+            item.setTimeSlot(slot);
+            item.setTotalStock(total);
+            item.setRemainStock(remain);
+            item.setAvailable(remain > 0 && (stock == null || stock.getStatus() == null || stock.getStatus() == 1));
+            items.add(item);
+        }
+
+        TicketAvailabilityVO vo = new TicketAvailabilityVO();
+        vo.setTicketTypeId(type.getId());
+        vo.setTicketName(type.getTicketName());
+        vo.setPlayDate(date);
+        vo.setTimeSlotEnabled(!slots.isEmpty());
+        vo.setSlots(items);
+        return vo;
     }
 
     @Override
@@ -216,7 +301,43 @@ public class AppScenicServiceImpl implements AppScenicService {
         if (dto.getScenicId() == null) {
             dto.setScenicId(AppUserContext.getScenicId());
         }
-        return aiService.chat(dto);
+
+        // AI 是外部依赖，慢或挂起会一直占住 HTTP 业务线程，并发上来足以拖垮整个接口层。
+        // 这里放进独立的 aiExecutor 并设超时：最多占用 AI 专用线程，业务线程不会被占满。
+        // AppUserContext 是 ThreadLocal，子线程取不到，需手动透传。
+        Long touristId = AppUserContext.getTouristId();
+        String touristNo = AppUserContext.getTouristNo();
+        Long scenicId = AppUserContext.getScenicId();
+
+        try {
+            return aiExecutor.submit(() -> {
+                AppUserContext.setTouristId(touristId);
+                AppUserContext.setTouristNo(touristNo);
+                AppUserContext.setScenicId(scenicId);
+                try {
+                    return aiService.chat(dto);
+                } finally {
+                    AppUserContext.clear();
+                }
+            }).get(ThreadPoolConfig.AI_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            log.warn("AI 问答超时，scenicId={}", dto.getScenicId());
+            throw new BusinessException("AI 服务响应超时，请稍后再试");
+        } catch (RejectedExecutionException e) {
+            log.warn("AI 问答被拒绝，线程池已满，scenicId={}", dto.getScenicId());
+            throw new BusinessException("AI 服务繁忙，请稍后再试");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new BusinessException("AI 服务调用被中断");
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            log.warn("AI 问答失败，scenicId={}，原因={}", dto.getScenicId(), cause == null ? null : cause.getMessage());
+            // 业务校验异常原样透出，其余包装成统一提示，避免把堆栈抛给前端
+            if (cause instanceof BusinessException businessException) {
+                throw businessException;
+            }
+            throw new BusinessException("AI 服务暂时不可用，请稍后再试");
+        }
     }
 
     @Override

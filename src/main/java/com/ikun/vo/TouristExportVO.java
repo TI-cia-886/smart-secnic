@@ -48,14 +48,6 @@ public class TouristExportVO implements Serializable {
     @ColumnWidth(14)
     private String sourceLabel;
 
-    @ExcelProperty("会员等级")
-    @ColumnWidth(12)
-    private String memberLevelLabel;
-
-    @ExcelProperty("积分")
-    @ColumnWidth(8)
-    private Integer points;
-
     @ExcelProperty("实名状态")
     @ColumnWidth(10)
     private String realNameStatusLabel;

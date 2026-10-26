@@ -18,4 +18,13 @@ public interface ScenicAreaService extends IService<ScenicArea> {
 
     /** 景区下拉选项（仅启用状态） */
     List<ScenicArea> listOptions();
+
+    /** 新增景区，并清除移动端相关缓存 */
+    void saveScenicArea(ScenicArea scenicArea);
+
+    /** 修改景区，并清除该景区的移动端缓存 */
+    void updateScenicArea(ScenicArea scenicArea);
+
+    /** 删除景区，并清除该景区的移动端缓存 */
+    void removeScenicArea(Long id);
 }

@@ -10,6 +10,7 @@ import com.ikun.entity.Tourist;
 import com.ikun.mapper.TouristMapper;
 import com.ikun.service.AppAuthService;
 import com.ikun.service.TokenBlacklistService;
+import com.ikun.util.CodeGenerator;
 import com.ikun.util.JwtUtil;
 import com.ikun.util.PasswordUtil;
 import com.ikun.util.SensitiveUtil;
@@ -43,6 +44,7 @@ public class AppAuthServiceImpl implements AppAuthService {
     private final TouristMapper touristMapper;
     private final JwtUtil jwtUtil;
     private final TokenBlacklistService tokenBlacklistService;
+    private final CodeGenerator codeGenerator;
 
     @Value("${jwt.token-prefix}")
     private String tokenPrefix;
@@ -98,8 +100,6 @@ public class AppAuthServiceImpl implements AppAuthService {
         tourist.setRealNameStatus(hasIdCard ? 1 : 0);
         tourist.setGender(0);
         tourist.setSource("MINI_PROGRAM");
-        tourist.setMemberLevel("NORMAL");
-        tourist.setPoints(0);
         tourist.setIsBlacklist(0);
         tourist.setStatus(1);
         tourist.setRegisterScenicId(dto.getScenicId());
@@ -175,17 +175,13 @@ public class AppAuthServiceImpl implements AppAuthService {
         vo.setTouristNo(tourist.getTouristNo());
         vo.setRealName(tourist.getRealName());
         vo.setPhone(SensitiveUtil.maskPhone(tourist.getPhone()));
-        vo.setMemberLevel(tourist.getMemberLevel());
-        vo.setPoints(tourist.getPoints());
         vo.setAvatar(tourist.getAvatar());
         vo.setRealNameStatus(tourist.getRealNameStatus());
         return vo;
     }
 
-    /** 游客编号：T + 日期 + 当日序号，如 T202509100001 */
+    /** 游客编号：统一走 CodeGenerator，形如 TR202510190001 */
     private String generateTouristNo() {
-        Long total = touristMapper.selectCount(null);
-        long seq = (total == null ? 0L : total) + 1L;
-        return "T" + LocalDate.now().format(NO_DATE_FORMAT) + String.format("%04d", seq);
+        return codeGenerator.daily(CodeGenerator.PREFIX_TOURIST);
     }
 }

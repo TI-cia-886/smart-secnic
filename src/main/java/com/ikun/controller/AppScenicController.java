@@ -11,10 +11,12 @@ import com.ikun.service.AppScenicService;
 import com.ikun.vo.AiChatReplyVO;
 import com.ikun.vo.AppHomeVO;
 import com.ikun.vo.AppRouteVO;
+import com.ikun.vo.TicketAvailabilityVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -84,6 +87,13 @@ public class AppScenicController {
     @GetMapping("/ticket/{id}")
     public Result<TicketType> ticketDetail(@PathVariable Long id) {
         return Result.success(appScenicService.ticketDetail(id));
+    }
+
+    @Operation(summary = "票种各时段余票", description = "分时预约：返回该票种某一天每个时段的剩余票数，购票页据此实时展示")
+    @GetMapping("/ticket/{id}/availability")
+    public Result<TicketAvailabilityVO> ticketAvailability(@PathVariable Long id,
+                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate playDate) {
+        return Result.success(appScenicService.ticketAvailability(id, playDate));
     }
 
     @Operation(summary = "景区公告列表", description = "含全平台公告，默认 10 条")

@@ -42,14 +42,11 @@ public class TouristVO implements Serializable {
     @Schema(description = "注册来源：MINI_PROGRAM/OTA/WINDOW")
     private String source;
 
-    @Schema(description = "会员等级：NORMAL/SILVER/GOLD/DIAMOND")
-    private String memberLevel;
-
-    @Schema(description = "积分")
-    private Integer points;
-
     @Schema(description = "实名状态：1已实名 0未实名")
     private Integer realNameStatus;
+
+    @Schema(description = "人脸录入状态：1已录入 0未录入")
+    private Integer faceStatus;
 
     @Schema(description = "是否黑名单：1是 0否")
     private Integer isBlacklist;

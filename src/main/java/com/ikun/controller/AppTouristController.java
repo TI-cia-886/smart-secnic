@@ -6,6 +6,7 @@ import com.ikun.service.AppTouristService;
 import com.ikun.vo.AppProfileVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,7 +35,7 @@ public class AppTouristController {
 
     @Operation(summary = "修改个人资料")
     @PutMapping("/update")
-    public Result<Void> update(@RequestBody AppTouristUpdateDTO dto) {
+    public Result<Void> update(@Valid @RequestBody AppTouristUpdateDTO dto) {
         appTouristService.updateProfile(dto);
         return Result.success("保存成功", null);
     }

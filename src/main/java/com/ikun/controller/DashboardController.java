@@ -1,6 +1,5 @@
 package com.ikun.controller;
 
-import com.ikun.annotation.RequirePerm;
 import com.ikun.common.Result;
 import com.ikun.service.DashboardService;
 import com.ikun.vo.DashboardVO;
@@ -25,8 +24,8 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
-    @Operation(summary = "首页统计数据")
-    @RequirePerm("dashboard:view")
+    @Operation(summary = "首页统计数据",
+            description = "所有后台角色登录后的落地页，仅要求登录；数据已按当前用户所属景区隔离，不设权限门槛，避免部分角色登录即弹「无权访问」")
     @GetMapping("/stats")
     public Result<DashboardVO> stats(@RequestParam(required = false) Long scenicId) {
         return Result.success(dashboardService.stats(scenicId));

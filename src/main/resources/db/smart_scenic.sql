@@ -200,10 +200,12 @@ CREATE TABLE `ticket_type` (
     `price`          DECIMAL(10, 2) NOT NULL DEFAULT 0.00 COMMENT '售价（元）',
     `original_price` DECIMAL(10, 2)          DEFAULT NULL COMMENT '原价（元）',
     `stock`          INT           NOT NULL DEFAULT 0 COMMENT '每日库存',
+    `time_slots`     VARCHAR(255)           DEFAULT NULL COMMENT '分时时段列表，逗号分隔，如 08:00-10:00,10:00-12:00；为空表示全天通用票',
     `description`    VARCHAR(255)           DEFAULT NULL COMMENT '票种说明',
     `status`         TINYINT       NOT NULL DEFAULT 1 COMMENT '状态：1上架 0下架',
     `create_time`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted`        TINYINT       NOT NULL DEFAULT 0 COMMENT '逻辑删除：1已删除 0未删除',
     PRIMARY KEY (`id`),
     KEY `idx_scenic_id` (`scenic_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='门票类型表';
@@ -218,14 +220,15 @@ CREATE TABLE `ticket_stock` (
     `scenic_id`      BIGINT   NOT NULL COMMENT '景区ID',
     `ticket_type_id` BIGINT   NOT NULL COMMENT '票种ID',
     `stock_date`     DATE     NOT NULL COMMENT '库存日期（游玩日期）',
-    `total_stock`    INT      NOT NULL DEFAULT 0 COMMENT '当日总库存，默认取 ticket_type.stock',
+    `time_slot`      VARCHAR(20) NOT NULL DEFAULT '' COMMENT '预约时段，如 08:00-10:00；空串表示全天不分时',
+    `total_stock`    INT      NOT NULL DEFAULT 0 COMMENT '该时段总库存，分时票取 ticket_type.stock 按时段数均分',
     `sold_count`     INT      NOT NULL DEFAULT 0 COMMENT '已售数量（已支付）',
     `locked_count`   INT      NOT NULL DEFAULT 0 COMMENT '锁定数量（已下单未支付）',
     `status`         TINYINT  NOT NULL DEFAULT 1 COMMENT '状态：1开放 0停售',
     `create_time`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_type_date` (`ticket_type_id`, `stock_date`),
+    UNIQUE KEY `uk_type_date_slot` (`ticket_type_id`, `stock_date`, `time_slot`),
     KEY `idx_scenic_date` (`scenic_id`, `stock_date`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='门票日期库存表';
 
@@ -243,6 +246,7 @@ CREATE TABLE `ticket_order` (
     `unit_price`     DECIMAL(10, 2) NOT NULL DEFAULT 0.00 COMMENT '单价（元）',
     `total_amount`   DECIMAL(10, 2) NOT NULL DEFAULT 0.00 COMMENT '订单总额（元）',
     `play_date`      DATE          NOT NULL COMMENT '游玩日期',
+    `time_slot`      VARCHAR(20)   NOT NULL DEFAULT '' COMMENT '预约时段，如 08:00-10:00；空串表示全天票',
     `status`         VARCHAR(20)   NOT NULL DEFAULT 'PENDING_PAY' COMMENT '状态：PENDING_PAY待付款 PAID已支付 VERIFIED已核销 REFUNDING已申请退票待审核 REFUNDED已退款 CANCELLED已取消',
     `channel`        VARCHAR(20)   NOT NULL DEFAULT 'MINI_PROGRAM' COMMENT '购票渠道：MINI_PROGRAM小程序 OTA第三方 WINDOW现场窗口 AGENCY旅行社',
     `expire_time`    DATETIME               DEFAULT NULL COMMENT '支付截止时间，超时由定时任务自动取消',
@@ -329,6 +333,7 @@ CREATE TABLE `parking_lot` (
     `latitude`    DECIMAL(10, 6)        DEFAULT NULL COMMENT '纬度',
     `create_time` DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted`     TINYINT     NOT NULL DEFAULT 0 COMMENT '逻辑删除：1已删除 0未删除',
     PRIMARY KEY (`id`),
     KEY `idx_scenic_id` (`scenic_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='停车场表';
@@ -353,9 +358,8 @@ CREATE TABLE `tourist` (
     `gender`           TINYINT     NOT NULL DEFAULT 0 COMMENT '性别：1男 2女 0未知',
     `avatar`           VARCHAR(255)         DEFAULT NULL COMMENT '头像',
     `source`           VARCHAR(20) NOT NULL DEFAULT 'MINI_PROGRAM' COMMENT '注册来源：MINI_PROGRAM小程序 OTA第三方 WINDOW现场',
-    `member_level`     VARCHAR(20) NOT NULL DEFAULT 'NORMAL' COMMENT '会员等级：NORMAL普通 SILVER白银 GOLD黄金 DIAMOND钻石',
-    `points`           INT         NOT NULL DEFAULT 0 COMMENT '积分',
     `real_name_status` TINYINT     NOT NULL DEFAULT 0 COMMENT '实名状态：1已实名 0未实名',
+    `face_status`      TINYINT     NOT NULL DEFAULT 0 COMMENT '人脸录入状态：1已录入 0未录入',
     `is_blacklist`     TINYINT     NOT NULL DEFAULT 0 COMMENT '是否黑名单：1是 0否',
     `blacklist_reason` VARCHAR(255)         DEFAULT NULL COMMENT '黑名单原因',
     `blacklist_time`   DATETIME             DEFAULT NULL COMMENT '加入/移出黑名单时间',
@@ -486,6 +490,7 @@ CREATE TABLE `ai_knowledge` (
     `status`      TINYINT      NOT NULL DEFAULT 1 COMMENT '状态：1启用 0禁用',
     `create_time` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted`     TINYINT      NOT NULL DEFAULT 0 COMMENT '逻辑删除：1已删除 0未删除',
     PRIMARY KEY (`id`),
     KEY `idx_scenic_id` (`scenic_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='AI知识库';
@@ -530,12 +535,12 @@ CREATE TABLE `ai_chat` (
 -- ============================================================================
 
 -- ---- 景区 ----
-INSERT INTO `scenic_area` (`id`, `scenic_code`, `scenic_name`, `level`, `province`, `city`, `address`, `longitude`, `latitude`, `daily_capacity`, `manager`, `phone`, `description`, `status`) VALUES
-(1, 'SC-001', '西湖风景区', '5A', '浙江省', '杭州市', '浙江省杭州市西湖区龙井路1号', 120.140000, 30.250000, 80000, '李秀英', '0571-87179617', '世界文化遗产，以西湖十景闻名，是杭州的城市名片。', 'ENABLE'),
-(2, 'SC-002', '黄山风景区', '5A', '安徽省', '黄山市', '安徽省黄山市黄山区汤口镇', 118.166000, 30.133000, 50000, '赵敏', '0559-5561111', '世界文化与自然双遗产，奇松、怪石、云海、温泉四绝。', 'ENABLE'),
-(3, 'SC-003', '九寨沟', '5A', '四川省', '阿坝州', '四川省阿坝藏族羌族自治州九寨沟县', 103.920000, 33.260000, 41000, '周明', '0837-7739753', '以翠海、叠瀑、彩林、雪峰、藏情五绝著称的自然保护区。', 'ENABLE'),
-(4, 'SC-004', '千岛湖', '4A', '浙江省', '杭州市', '浙江省杭州市淳安县千岛湖镇', 119.040000, 29.600000, 35000, '吴海燕', '0571-24817707', '因湖中拥有1078座岛屿而得名的人工湖景区。', 'ENABLE'),
-(5, 'SC-005', '乌镇古镇', '5A', '浙江省', '嘉兴市', '浙江省嘉兴市桐乡市乌镇镇石佛南路18号', 120.490000, 30.740000, 60000, '郑伟', '0573-88731088', '典型的江南水乡古镇，以东西栅景区闻名。', 'DISABLE');
+INSERT INTO `scenic_area` (`id`, `scenic_code`, `scenic_name`, `level`, `province`, `city`, `address`, `longitude`, `latitude`, `daily_capacity`, `manager`, `phone`, `description`, `cover_img`, `status`) VALUES
+(1, 'SC-001', '西湖风景区', '5A', '浙江省', '杭州市', '浙江省杭州市西湖区龙井路1号', 120.140000, 30.250000, 80000, '李秀英', '0571-87179617', '世界文化遗产，以西湖十景闻名，是杭州的城市名片。', '/api/upload/scenic/scenic-xihu.jpg', 'ENABLE'),
+(2, 'SC-002', '黄山风景区', '5A', '安徽省', '黄山市', '安徽省黄山市黄山区汤口镇', 118.166000, 30.133000, 50000, '赵敏', '0559-5561111', '世界文化与自然双遗产，奇松、怪石、云海、温泉四绝。', '/api/upload/scenic/scenic-huangshan.jpg', 'ENABLE'),
+(3, 'SC-003', '九寨沟', '5A', '四川省', '阿坝州', '四川省阿坝藏族羌族自治州九寨沟县', 103.920000, 33.260000, 41000, '周明', '0837-7739753', '以翠海、叠瀑、彩林、雪峰、藏情五绝著称的自然保护区。', '/api/upload/scenic/scenic-jiuzhaigou.jpg', 'ENABLE'),
+(4, 'SC-004', '千岛湖', '4A', '浙江省', '杭州市', '浙江省杭州市淳安县千岛湖镇', 119.040000, 29.600000, 35000, '吴海燕', '0571-24817707', '因湖中拥有1078座岛屿而得名的人工湖景区。', '/api/upload/scenic/scenic-gulangyu.jpg', 'ENABLE'),
+(5, 'SC-005', '乌镇古镇', '5A', '浙江省', '嘉兴市', '浙江省嘉兴市桐乡市乌镇镇石佛南路18号', 120.490000, 30.740000, 60000, '郑伟', '0573-88731088', '典型的江南水乡古镇，以东西栅景区闻名。', '/api/upload/scenic/scenic-lijiang.jpg', 'DISABLE');
 
 -- ---- 角色 ----
 INSERT INTO `sys_role` (`id`, `role_name`, `role_code`, `description`, `status`) VALUES
@@ -600,7 +605,10 @@ INSERT INTO `sys_permission` (`id`, `parent_id`, `perm_name`, `perm_code`, `perm
 (43, 0,  '登录日志',       'system:loginlog:list',     1, '/system/login-log',    'login',    12, 1),
 (44, 0,  '操作日志',       'system:operlog:list',      1, '/system/oper-log',     'log',      13, 1),
 -- 景区管理（9）按钮：删除景区（仅超级管理员）
-(45, 9,  '删除景区',       'scenic:area:delete',       2, NULL,                   NULL,       3, 1);
+(45, 9,  '删除景区',       'scenic:area:delete',       2, NULL,                   NULL,       3, 1),
+-- 游客信息管理（13）按钮：导出 / 导入（upgrade_v5_perm_fix.sql 同步）
+(54, 13, '游客导出',       'tourist:export',           2, NULL,                   NULL,       3, 1),
+(55, 13, '游客导入',       'tourist:import',           2, NULL,                   NULL,       4, 1);
 
 -- ---- 后台用户 ----
 -- 说明：密码以历史 MD5 形式给出（明文统一为 123456），
@@ -619,17 +627,18 @@ INSERT INTO `sys_user` (`id`, `username`, `password`, `real_name`, `phone`, `rol
 INSERT INTO `sys_role_permission` (`role_id`, `permission_id`)
 SELECT 1, `id` FROM `sys_permission`;
 
--- ---- 角色权限：景区管理员（本景区全业务，但「景区总管理」9/10/11 仅超级管理员可见） ----
+-- ---- 角色权限：景区管理员（本景区全业务）
+--      系统管理（账号 2~6、角色 7~8、日志 43~44）仅超级管理员可用，不再授予其他角色；
+--      景区总管理 9/10/11 同样仅超级管理员可见。 ----
 INSERT INTO `sys_role_permission` (`role_id`, `permission_id`) VALUES
-(2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8),
+(2, 1),
 (2, 12), (2, 26), (2, 27), (2, 28), (2, 29),
-(2, 13), (2, 14), (2, 30),
+(2, 13), (2, 14), (2, 30), (2, 54), (2, 55),
 (2, 15), (2, 16), (2, 17), (2, 31),
 (2, 18), (2, 32), (2, 33), (2, 34),
 (2, 19), (2, 20), (2, 21), (2, 35), (2, 36),
 (2, 22), (2, 23), (2, 37), (2, 38), (2, 39), (2, 40),
-(2, 24), (2, 25), (2, 41), (2, 42),
-(2, 43), (2, 44);
+(2, 24), (2, 25), (2, 41), (2, 42);
 
 -- ---- 角色权限：运营人员（票务、公告、客流） ----
 INSERT INTO `sys_role_permission` (`role_id`, `permission_id`) VALUES
@@ -642,7 +651,7 @@ INSERT INTO `sys_role_permission` (`role_id`, `permission_id`) VALUES
 -- ---- 角色权限：客服人员（游客、工单） ----
 INSERT INTO `sys_role_permission` (`role_id`, `permission_id`) VALUES
 (4, 1),
-(4, 13), (4, 14), (4, 30),
+(4, 13), (4, 14), (4, 30), (4, 54),
 (4, 15), (4, 17),
 (4, 19), (4, 20), (4, 21), (4, 35), (4, 36);
 
@@ -684,12 +693,12 @@ INSERT INTO `ticket_stock` (`scenic_id`, `ticket_type_id`, `stock_date`, `total_
 (2, 6, '2025-05-31', 1000, 880,  22, 1);
 
 -- ---- 游客 ----
-INSERT INTO `tourist` (`id`, `tourist_no`, `real_name`, `phone`, `id_card`, `gender`, `source`, `member_level`, `points`, `real_name_status`, `is_blacklist`, `blacklist_reason`, `last_enter_time`, `status`) VALUES
-(1, 'T20250001', '王晓明', '13812341122', '330106199001011234', 1, 'MINI_PROGRAM', 'GOLD',   3200, 1, 0, NULL, '2025-05-31 09:12:00', 1),
-(2, 'T20250002', '林小红', '13912342233', '330106199502022345', 2, 'OTA',          'SILVER', 1500, 1, 0, NULL, '2025-05-30 14:20:00', 1),
-(3, 'T20250003', '张大军', '13712343344', '330106198803033456', 1, 'WINDOW',       'NORMAL', 200,  1, 1, '多次恶意退票', '2025-05-28 10:05:00', 1),
-(4, 'T20250004', '陈思思', '13612344455', '330106200104044567', 2, 'MINI_PROGRAM', 'NORMAL', 800,  1, 0, NULL, '2025-05-31 08:40:00', 1),
-(5, 'T20250005', '刘建国', '13512345566', '330106197505055678', 1, 'OTA',          'DIAMOND',5600, 1, 1, '使用他人证件入园', '2025-05-20 16:30:00', 1);
+INSERT INTO `tourist` (`id`, `tourist_no`, `real_name`, `phone`, `id_card`, `gender`, `source`, `real_name_status`, `is_blacklist`, `blacklist_reason`, `last_enter_time`, `status`) VALUES
+(1, 'T20250001', '王晓明', '13812341122', '330106199001011234', 1, 'MINI_PROGRAM', 1, 0, NULL, '2025-05-31 09:12:00', 1),
+(2, 'T20250002', '林小红', '13912342233', '330106199502022345', 2, 'OTA',          1, 0, NULL, '2025-05-30 14:20:00', 1),
+(3, 'T20250003', '张大军', '13712343344', '330106198803033456', 1, 'WINDOW',       1, 1, '多次恶意退票', '2025-05-28 10:05:00', 1),
+(4, 'T20250004', '陈思思', '13612344455', '330106200104044567', 2, 'MINI_PROGRAM', 1, 0, NULL, '2025-05-31 08:40:00', 1),
+(5, 'T20250005', '刘建国', '13512345566', '330106197505055678', 1, 'OTA',          1, 1, '使用他人证件入园', '2025-05-20 16:30:00', 1);
 
 -- ---- 门票订单 ----
 INSERT INTO `ticket_order` (`id`, `order_no`, `tourist_id`, `scenic_id`, `ticket_type_id`, `ticket_name`, `quantity`, `unit_price`, `total_amount`, `play_date`, `status`, `channel`, `pay_time`, `verify_time`, `contact_name`, `contact_phone`) VALUES

@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 公告资讯服务实现
@@ -34,6 +35,12 @@ public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Ann
     private static final String STATUS_DRAFT = "DRAFT";
     private static final String STATUS_PUBLISHED = "PUBLISHED";
     private static final String STATUS_OFFLINE = "OFFLINE";
+
+    /** 公告状态白名单 */
+    private static final Set<String> ANNOUNCEMENT_STATUS =
+            Set.of(STATUS_DRAFT, STATUS_PUBLISHED, STATUS_OFFLINE);
+    /** 公告类型白名单 */
+    private static final Set<String> ANNOUNCEMENT_TYPES = Set.of("NOTICE", "WARNING", "ACTIVITY");
 
     @Override
     public PageResult<Announcement> pageQuery(Integer pageNum, Integer pageSize, String keyword,
@@ -82,6 +89,7 @@ public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Ann
         if (announcement.getAiGenerated() == null) {
             announcement.setAiGenerated(0);
         }
+        validateAnnouncement(announcement);
         save(announcement);
         log.info("新增公告成功：id={}，title={}", announcement.getId(), announcement.getTitle());
     }
@@ -103,6 +111,7 @@ public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Ann
         announcement.setCreateTime(null);
         announcement.setUpdateTime(null);
         announcement.setDeleted(null);
+        validateAnnouncement(announcement);
         updateById(announcement);
         log.info("编辑公告成功：id={}", announcement.getId());
     }
@@ -165,8 +174,28 @@ public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Ann
         return this.list(wrapper);
     }
 
+    /**
+     * 公告关键字段校验：类型与状态都是字典字段，任意字符串会让前台按类型筛选时查不到数据；
+     * 标题/正文只在「发布」时才校验，保存草稿时不拦，这里统一兜住长度上限。
+     */
+    private void validateAnnouncement(Announcement announcement) {
+        if (StringUtils.hasText(announcement.getType())
+                && !ANNOUNCEMENT_TYPES.contains(announcement.getType())) {
+            throw new BusinessException("公告类型只能是 " + String.join("/", ANNOUNCEMENT_TYPES));
+        }
+        if (StringUtils.hasText(announcement.getStatus())
+                && !ANNOUNCEMENT_STATUS.contains(announcement.getStatus())) {
+            throw new BusinessException("公告状态只能是 " + String.join("/", ANNOUNCEMENT_STATUS));
+        }
+        if (announcement.getTitle() != null && announcement.getTitle().length() > 100) {
+            throw new BusinessException("公告标题不能超过 100 个字符");
+        }
+        if (announcement.getContent() != null && announcement.getContent().length() > 2000) {
+            throw new BusinessException("公告正文不能超过 2000 个字符");
+        }
+    }
+
     /** 全局公告（scenicId 为空）由超管维护，受限账号不得改动 */
-    private void checkWritable(Announcement announcement) {
-        ScenicScope.checkWritable(announcement.getScenicId());
+    private void checkWritable(Announcement announcement) {        ScenicScope.checkWritable(announcement.getScenicId());
     }
 }

@@ -1,7 +1,6 @@
 package com.ikun.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
@@ -13,8 +12,9 @@ import lombok.Data;
 @Schema(description = "AI 内容生成参数")
 public class AiGenerateDTO {
 
-    @NotBlank(message = "请指定生成场景")
-    @Schema(description = "场景：ANNOUNCEMENT 公告草稿 / FLOW_PLAN 客流疏导预案",
+    // 场景由 Controller 按接口强制覆盖（announcement/draft -> ANNOUNCEMENT、flow-plan -> FLOW_PLAN），
+    // 前端无需传入；若加 @NotBlank，@Valid 会在 setScene 之前拦截请求导致无法生成
+    @Schema(description = "场景：ANNOUNCEMENT 公告草稿 / FLOW_PLAN 客流疏导预案（由接口指定，前端无需传入）",
             example = "ANNOUNCEMENT")
     private String scene;
 

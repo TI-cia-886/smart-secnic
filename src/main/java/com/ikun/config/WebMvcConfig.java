@@ -6,10 +6,13 @@ import com.ikun.interceptor.JwtInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.time.Duration;
 
 /**
  * Web MVC 配置：跨域、静态资源映射、拦截器注册
@@ -41,11 +44,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .maxAge(3600);
     }
 
-    /** 静态资源映射：上传文件可通过 /upload/xxx 访问 */
+    /** 静态资源映射：上传文件可通过 /upload/xxx 访问；加长缓存，二次访问/切回已看过的景区不再重新下载 */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler(accessPrefix + "**")
-                .addResourceLocations("file:" + uploadPath);
+                .addResourceLocations("file:" + uploadPath)
+                .setCacheControl(CacheControl.maxAge(Duration.ofDays(7)).cachePublic());
         // 接口文档静态资源：Swagger UI 由 springdoc 自动注册，这里保留 webjars 兜底
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
@@ -77,6 +81,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/config/**",
                         // 静态资源
                         "/upload/**",
+                        // 缩略图接口（游客免登录可浏览列表，封面缩略图同样免登录）
+                        "/img/**",
                         "/favicon.ico",
                         "/error"
                 );
@@ -88,7 +94,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/app/auth/logout",
                         "/app/order/**",
                         "/app/tourist/**",
-                        "/app/complaint/**"
+                        "/app/complaint/**",
+                        "/app/face/**"
                 );
 
         // 可选登录：首页、景区浏览等公开接口，带 Token 时识别身份（如待支付订单数），

@@ -44,6 +44,9 @@ public class PermissionService {
     /** 超级管理员角色编码：拥有全部权限，不受权限表配置影响 */
     private static final String SUPER_ADMIN_CODE = "SUPER_ADMIN";
 
+    /** 系统管理类权限前缀（账号 / 角色 / 日志）：仅超级管理员可持有 */
+    private static final String SYSTEM_PERM_PREFIX = "system:";
+
     /** 权限缓存有效期：30 分钟，兜底防止角色权限变更后缓存长期不一致 */
     private static final Duration CACHE_TTL = Duration.ofMinutes(30);
 
@@ -70,6 +73,11 @@ public class PermissionService {
         if (!StringUtils.hasText(permCode)) {
             return false;
         }
+        // 系统管理（账号/角色/日志）仅超级管理员可用：
+        // 即使数据库被误授权，服务端也强制拦截，保证系统管理功能不外流
+        if (permCode.startsWith(SYSTEM_PERM_PREFIX)) {
+            return false;
+        }
         return getPermissions(roleId).contains(permCode);
     }
 
@@ -82,7 +90,10 @@ public class PermissionService {
             return true;
         }
         Set<String> owned = getPermissions(roleId);
-        return Arrays.stream(permCodes).anyMatch(owned::contains);
+        return Arrays.stream(permCodes)
+                // 系统管理权限对非超管一律视为未持有
+                .filter(code -> !code.startsWith(SYSTEM_PERM_PREFIX))
+                .anyMatch(owned::contains);
     }
 
     /**

@@ -8,9 +8,11 @@ import com.ikun.dto.ComplaintAssignDTO;
 import com.ikun.dto.ComplaintReplyDTO;
 import com.ikun.dto.ComplaintSummaryDTO;
 import com.ikun.service.ComplaintService;
+import com.ikun.service.SysUserService;
 import com.ikun.vo.ComplaintDetailVO;
 import com.ikun.vo.ComplaintSummaryVO;
 import com.ikun.vo.ComplaintVO;
+import com.ikun.vo.UserOptionVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,6 +21,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 投诉工单管理接口（对应原型：投诉工单管理页面）
@@ -32,6 +35,14 @@ import java.time.LocalDate;
 public class ComplaintController {
 
     private final ComplaintService complaintService;
+    private final SysUserService sysUserService;
+
+    @Operation(summary = "处理人下拉选项", description = "供转派工单选择处理人；按景区隔离，仅需工单查看权限")
+    @RequirePerm("complaint:list")
+    @GetMapping("/handlers")
+    public Result<List<UserOptionVO>> handlers() {
+        return Result.success(sysUserService.handlerOptions());
+    }
 
     @Operation(summary = "分页查询工单列表")
     @RequirePerm("complaint:list")
@@ -42,13 +53,12 @@ public class ComplaintController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long scenicId,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) String priority,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String sentiment,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return Result.success(complaintService.pageQuery(pageNum, pageSize, keyword, scenicId, type,
-                priority, status, sentiment, startDate, endDate));
+                status, sentiment, startDate, endDate));
     }
 
     @Operation(summary = "查询工单详情", description = "含全部回复记录")

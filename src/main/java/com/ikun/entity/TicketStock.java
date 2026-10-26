@@ -36,6 +36,14 @@ public class TicketStock implements Serializable {
     /** 库存日期（游玩日期） */
     private LocalDate stockDate;
 
+    /**
+     * 预约时段，如 {@code 08:00-10:00}；空串表示全天（票种未开启分时）。
+     *
+     * <p>库存粒度因此变为 (票种, 日期, 时段)，唯一键同步调整，
+     * 空串行的行为与未引入时段前完全一致，保证历史数据平滑兼容。</p>
+     */
+    private String timeSlot;
+
     /** 当日总库存 */
     private Integer totalStock;
 

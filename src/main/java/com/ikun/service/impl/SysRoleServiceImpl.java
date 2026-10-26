@@ -44,6 +44,9 @@ public class SysRoleServiceImpl implements SysRoleService {
     /** 超级管理员角色编码：禁止删除、禁止改编码，否则系统会失去唯一的全权账号 */
     private static final String SUPER_ADMIN_CODE = "SUPER_ADMIN";
 
+    /** 系统管理类权限前缀（账号 / 角色 / 日志）：仅超级管理员持有，不参与分配 */
+    private static final String SYSTEM_PERM_PREFIX = "system:";
+
     private final SysRoleMapper sysRoleMapper;
     private final SysPermissionMapper sysPermissionMapper;
     private final SysRolePermissionMapper sysRolePermissionMapper;
@@ -147,11 +150,15 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<PermissionTreeVO> permissionTree(Long roleId) {
         List<SysPermission> all = sysPermissionMapper.selectList(Wrappers.<SysPermission>lambdaQuery()
-                .eq(SysPermission::getStatus, 1)
-                .orderByAsc(SysPermission::getSort)
-                .orderByAsc(SysPermission::getId));
+                        .eq(SysPermission::getStatus, 1)
+                        .orderByAsc(SysPermission::getSort)
+                        .orderByAsc(SysPermission::getId)).stream()
+                // 系统管理权限仅超级管理员可用，不在分配树中出现，避免被勾选分配
+                .filter(p -> p.getPermCode() == null || !p.getPermCode().startsWith(SYSTEM_PERM_PREFIX))
+                .collect(Collectors.toList());
         Set<Long> granted = roleId == null
                 ? Collections.emptySet()
                 : sysRolePermissionMapper.selectList(Wrappers.<SysRolePermission>lambdaQuery()
@@ -159,6 +166,21 @@ public class SysRoleServiceImpl implements SysRoleService {
                 .stream()
                 .map(SysRolePermission::getPermissionId)
                 .collect(Collectors.toSet());
+
+        // 自清理：绑定表中已不存在 / 被禁用 / 系统权限的悬空记录，
+        // 打开页面即自动删除，保证「已配权限」计数与树上勾选一致
+        if (roleId != null && !granted.isEmpty()) {
+            Set<Long> nodeIds = all.stream().map(SysPermission::getId).collect(Collectors.toSet());
+            List<Long> stale = granted.stream()
+                    .filter(id -> !nodeIds.contains(id))
+                    .collect(Collectors.toList());
+            if (!stale.isEmpty()) {
+                sysRolePermissionMapper.delete(Wrappers.<SysRolePermission>lambdaQuery()
+                        .eq(SysRolePermission::getRoleId, roleId)
+                        .in(SysRolePermission::getPermissionId, stale));
+                log.info("清理角色悬空权限绑定：roleId={}，失效权限ID={}", roleId, stale);
+            }
+        }
 
         // 先全量建节点，再按 parentId 挂接，避免依赖数据库返回顺序
         Map<Long, PermissionTreeVO> nodeMap = new LinkedHashMap<>();
@@ -198,22 +220,28 @@ public class SysRoleServiceImpl implements SysRoleService {
             throw new BusinessException("超级管理员默认拥有全部权限，无需分配");
         }
 
-        List<Long> permissionIds = dto.getPermissionIds() == null
+        // 静默过滤无效项：权限表中已不存在的 id、系统管理权限（仅超管持有）直接忽略，
+        // 覆盖式写入后历史脏数据随之清除，保存即完成清理，不再因脏数据抛错阻断保存
+        List<Long> requested = dto.getPermissionIds() == null
                 ? Collections.emptyList()
                 : dto.getPermissionIds().stream().filter(java.util.Objects::nonNull).distinct().collect(Collectors.toList());
+        List<SysPermission> validPerms = requested.isEmpty()
+                ? Collections.emptyList()
+                : sysPermissionMapper.selectBatchIds(requested);
+        List<Long> permissionIds = validPerms.stream()
+                .filter(p -> p.getPermCode() == null || !p.getPermCode().startsWith(SYSTEM_PERM_PREFIX))
+                .map(SysPermission::getId)
+                .collect(Collectors.toList());
+        if (requested.size() > permissionIds.size()) {
+            log.info("忽略无效/不可分配的权限提交 {} 项：roleId={}", requested.size() - permissionIds.size(), dto.getRoleId());
+        }
 
         // 覆盖式更新：先清空再写入，语义明确且不会残留旧权限
         sysRolePermissionMapper.delete(Wrappers.<SysRolePermission>lambdaQuery()
                 .eq(SysRolePermission::getRoleId, dto.getRoleId()));
         if (!CollectionUtils.isEmpty(permissionIds)) {
-            // 校验权限ID真实存在，防止前端传入非法ID污染关联表
-            List<Long> validIds = sysPermissionMapper.selectBatchIds(permissionIds).stream()
-                    .map(SysPermission::getId)
-                    .collect(Collectors.toList());
-            if (validIds.size() != permissionIds.size()) {
-                throw new BusinessException("提交的权限中包含不存在的权限项，请刷新页面后重试");
-            }
-            for (Long permissionId : validIds) {
+            // permissionIds 已在上方完成有效性校验与系统权限过滤，这里直接写入
+            for (Long permissionId : permissionIds) {
                 SysRolePermission relation = new SysRolePermission();
                 relation.setRoleId(dto.getRoleId());
                 relation.setPermissionId(permissionId);

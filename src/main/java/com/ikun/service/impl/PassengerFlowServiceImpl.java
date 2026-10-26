@@ -56,6 +56,9 @@ public class PassengerFlowServiceImpl implements PassengerFlowService {
     private static final double WARNING_THRESHOLD = 70D;
     private static final double DANGER_THRESHOLD = 90D;
 
+    /** 统一离园时刻：当日 18:00 后视为全部离园（与订单核销侧 LEAVE_HOUR 同一口径） */
+    private static final int LEAVE_HOUR = 18;
+
     private static final String LEVEL_NORMAL = "NORMAL";
     private static final String LEVEL_WARNING = "WARNING";
     private static final String LEVEL_DANGER = "DANGER";
@@ -110,6 +113,16 @@ public class PassengerFlowServiceImpl implements PassengerFlowService {
         vo.setSaturationRate(saturation);
         vo.setWarningLevel(levelOf(saturation));
 
+        // 业务闭环：核销即入园；当日 18:00（统一离园时刻）后，在园清零、离园补齐，
+        // 并把闭园结果落库到 18 点时段行，保证实时概览、客流报表、趋势图同一口径
+        if (date.equals(LocalDate.now()) && LocalTime.now().getHour() >= LEAVE_HOUR) {
+            closeDayAfterLeave(scenicId, enterTotal, capacity);
+            vo.setCurrentCount(0);
+            vo.setTodayLeaveCount(Math.max(enterTotal, leaveTotal));
+            vo.setSaturationRate(BigDecimal.ZERO);
+            vo.setWarningLevel(LEVEL_NORMAL);
+        }
+
         // 各景点实时明细：承载量为 0 的景点（如免费开放区域）不算异常，否则会一直飘红
         List<ScenicSpot> spots = scenicSpotMapper.selectList(Wrappers.<ScenicSpot>lambdaQuery()
                 .eq(ScenicSpot::getScenicId, scenicId)
@@ -145,6 +158,41 @@ public class PassengerFlowServiceImpl implements PassengerFlowService {
         vo.setHourlyTrend(hourlyTrend);
         vo.setOnlineTrend(onlineTrend);
         return vo;
+    }
+
+    /**
+     * 闭园落库（幂等）：把当日离园数写到 18 点时段行、在园清零。
+     * 已有闭园行且离园数不小于累计入园时跳过，可安全重复执行。
+     */
+    private void closeDayAfterLeave(Long scenicId, int enterTotal, int capacity) {
+        try {
+            LocalDate today = LocalDate.now();
+            PassengerFlow closure = passengerFlowMapper.selectOne(Wrappers.<PassengerFlow>lambdaQuery()
+                    .eq(PassengerFlow::getScenicId, scenicId)
+                    .eq(PassengerFlow::getStatDate, today)
+                    .eq(PassengerFlow::getStatHour, LEAVE_HOUR)
+                    .last("LIMIT 1"));
+            if (closure == null) {
+                PassengerFlow insert = new PassengerFlow();
+                insert.setScenicId(scenicId);
+                insert.setStatDate(today);
+                insert.setStatHour(LEAVE_HOUR);
+                insert.setEnterCount(0);
+                insert.setLeaveCount(enterTotal);
+                insert.setCurrentCount(0);
+                insert.setCapacity(capacity);
+                insert.setWarningLevel(LEVEL_NORMAL);
+                passengerFlowMapper.insert(insert);
+            } else if (nz(closure.getLeaveCount()) < enterTotal) {
+                PassengerFlow update = new PassengerFlow();
+                update.setId(closure.getId());
+                update.setLeaveCount(enterTotal);
+                update.setCurrentCount(0);
+                passengerFlowMapper.updateById(update);
+            }
+        } catch (Exception e) {
+            log.warn("闭园落库失败（不影响概览/报表展示）", e);
+        }
     }
 
     @Override
@@ -218,6 +266,17 @@ public class PassengerFlowServiceImpl implements PassengerFlowService {
             throw new BusinessException("开始日期不能晚于结束日期");
         }
         ScenicArea area = scenicAreaMapper.selectById(scenicId);
+
+        // 报表涉及当天且已过统一离园时刻时，先落库闭园行，保证「离园/在园」与概览口径一致
+        if (end.equals(LocalDate.now()) && LocalTime.now().getHour() >= LEAVE_HOUR) {
+            int todayEnter = nz(passengerFlowMapper.selectList(Wrappers.<PassengerFlow>lambdaQuery()
+                    .eq(PassengerFlow::getScenicId, scenicId)
+                    .eq(PassengerFlow::getStatDate, end))
+                    .stream()
+                    .mapToInt(f -> nz(f.getEnterCount()))
+                    .sum());
+            closeDayAfterLeave(scenicId, todayEnter, area == null || area.getDailyCapacity() == null ? 0 : area.getDailyCapacity());
+        }
 
         List<PassengerFlow> flows = passengerFlowMapper.selectList(Wrappers.<PassengerFlow>lambdaQuery()
                 .eq(PassengerFlow::getScenicId, scenicId)

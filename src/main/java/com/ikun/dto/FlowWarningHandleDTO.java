@@ -3,6 +3,7 @@ package com.ikun.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -19,6 +20,7 @@ public class FlowWarningHandleDTO {
     private Long warningId;
 
     @NotBlank(message = "请填写处置说明")
+    @Size(max = 200, message = "处置说明不能超过 200 个字符")
     @Schema(description = "处置说明，如「已启动分时预约限流，东门临时封闭」",
             example = "已启动分时预约限流，东门临时封闭 30 分钟")
     private String handleRemark;

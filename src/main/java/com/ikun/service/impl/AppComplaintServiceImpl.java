@@ -20,6 +20,7 @@ import com.ikun.mapper.TouristMapper;
 import com.ikun.service.AiClient;
 import com.ikun.service.AppComplaintService;
 import com.ikun.service.ComplaintService;
+import com.ikun.util.CodeGenerator;
 import com.ikun.util.SensitiveUtil;
 import com.ikun.vo.ComplaintDetailVO;
 import com.ikun.vo.ComplaintVO;
@@ -66,6 +67,7 @@ public class AppComplaintServiceImpl implements AppComplaintService {
     private final TicketOrderMapper ticketOrderMapper;
     private final AiClient aiClient;
     private final ComplaintService complaintService;
+    private final CodeGenerator codeGenerator;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -95,7 +97,6 @@ public class AppComplaintServiceImpl implements AppComplaintService {
         complaint.setTitle(dto.getTitle().trim());
         complaint.setContent(dto.getContent().trim());
         complaint.setType(normalizeType(dto.getType()));
-        complaint.setPriority("NEGATIVE".equals(sentiment) ? "URGENT" : "NORMAL");
         complaint.setStatus(STATUS_PENDING);
         complaint.setSentiment(sentiment);
         complaint.setSentimentScore(BigDecimal.valueOf(score).setScale(2, RoundingMode.HALF_UP));
@@ -241,12 +242,12 @@ public class AppComplaintServiceImpl implements AppComplaintService {
         };
     }
 
-    /** 工单编号：TK-yyyyMMdd-序号，如 TK-20250910-001 */
+    /**
+     * 工单编号：统一走 CodeGenerator，形如 WO202510190001。
+     * 原前缀 TK 与门票 Ticket 语义冲突，已改 WO（Work Order）。
+     */
     private String generateTicketNo() {
-        Long todayCount = complaintMapper.selectCount(Wrappers.<Complaint>lambdaQuery()
-                .ge(Complaint::getCreateTime, LocalDate.now().atStartOfDay()));
-        long seq = (todayCount == null ? 0L : todayCount) + 1L;
-        return "TK-" + LocalDate.now().format(NO_DATE_FORMAT) + "-" + String.format("%03d", seq);
+        return codeGenerator.daily(CodeGenerator.PREFIX_WORK_ORDER);
     }
 
     private String sentimentLabel(double score) {
@@ -270,8 +271,6 @@ public class AppComplaintServiceImpl implements AppComplaintService {
         vo.setContent(complaint.getContent());
         vo.setType(complaint.getType());
         vo.setTypeText(typeText(complaint.getType()));
-        vo.setPriority(complaint.getPriority());
-        vo.setPriorityText("URGENT".equals(complaint.getPriority()) ? "紧急" : "普通");
         vo.setStatus(complaint.getStatus());
         vo.setStatusText(statusText(complaint.getStatus()));
         vo.setSentiment(complaint.getSentiment());

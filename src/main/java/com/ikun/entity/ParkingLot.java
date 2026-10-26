@@ -48,4 +48,8 @@ public class ParkingLot implements Serializable {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    /** 逻辑删除：1已删除 0未删除 */
+    @TableLogic
+    private Integer deleted;
 }

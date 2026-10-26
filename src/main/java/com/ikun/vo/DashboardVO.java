@@ -71,10 +71,13 @@ public class DashboardVO implements Serializable {
     @Schema(description = "近 7 日在园人数峰值趋势（按日期升序，最后一项为今天）")
     private List<Long> onlineTrend;
 
-    @Schema(description = "近 7 日订单数趋势（按游玩日期升序）")
+    @Schema(description = "近 7 日趋势对应的日期（M/d，按日期升序，最后一项为今天）")
+    private List<String> trendDates;
+
+    @Schema(description = "近 7 日成交订单数趋势（按支付时间归集，仅已支付/已核销，与营收同口径）")
     private List<Long> orderTrend;
 
-    @Schema(description = "近 7 日营收趋势（按游玩日期升序，单位：元）")
+    @Schema(description = "近 7 日营收趋势（按支付时间归集，仅已支付/已核销，单位：元）")
     private List<Long> revenueTrend;
 
     @Schema(description = "近 7 日新增工单趋势（按创建日期升序）")

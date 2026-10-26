@@ -3,6 +3,7 @@ package com.ikun.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -21,10 +22,12 @@ public class AppComplaintDTO {
     private String orderNo;
 
     @NotBlank(message = "请填写问题标题")
+    @Size(max = 60, message = "问题标题不能超过 60 个字符")
     @Schema(description = "问题标题", example = "东门排队时间过长")
     private String title;
 
     @NotBlank(message = "请描述您遇到的问题")
+    @Size(max = 1000, message = "问题描述不能超过 1000 个字符")
     @Schema(description = "问题描述")
     private String content;
 

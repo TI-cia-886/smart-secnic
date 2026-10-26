@@ -47,6 +47,9 @@ public class TicketOrder implements Serializable {
     /** 游玩日期 */
     private LocalDate playDate;
 
+    /** 预约时段，如 08:00-10:00；空串表示全天票 */
+    private String timeSlot;
+
     /** 状态：PENDING_PAY/PAID/VERIFIED/REFUNDING/REFUNDED/CANCELLED */
     private String status;
 

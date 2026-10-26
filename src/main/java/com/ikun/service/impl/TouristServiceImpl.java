@@ -1,6 +1,5 @@
 package com.ikun.service.impl;
 
-import cn.hutool.core.util.IdUtil;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -18,6 +17,7 @@ import com.ikun.mapper.ComplaintMapper;
 import com.ikun.mapper.TicketOrderMapper;
 import com.ikun.mapper.TouristMapper;
 import com.ikun.service.TouristService;
+import com.ikun.util.CodeGenerator;
 import com.ikun.util.PasswordUtil;
 import com.ikun.util.SensitiveUtil;
 import com.ikun.vo.StatItemVO;
@@ -44,7 +44,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * 游客信息服务实现
@@ -63,10 +62,11 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
 
     private final TicketOrderMapper ticketOrderMapper;
     private final ComplaintMapper complaintMapper;
+    private final CodeGenerator codeGenerator;
 
     @Override
     public PageResult<TouristVO> pageQuery(Integer pageNum, Integer pageSize, String keyword, Long scenicId,
-                                           String memberLevel, Integer isBlacklist, Integer realNameStatus,
+                                           Integer isBlacklist, Integer realNameStatus,
                                            Integer status) {
         Long scopeScenicId = ScenicScope.resolve(scenicId);
         var wrapper = Wrappers.<Tourist>lambdaQuery()
@@ -75,7 +75,6 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
                 .and(StringUtils.hasText(keyword), w -> w
                         .like(Tourist::getRealName, keyword).or()
                         .like(Tourist::getTouristNo, keyword))
-                .eq(StringUtils.hasText(memberLevel), Tourist::getMemberLevel, memberLevel)
                 .eq(isBlacklist != null, Tourist::getIsBlacklist, isBlacklist)
                 .eq(realNameStatus != null, Tourist::getRealNameStatus, realNameStatus)
                 .eq(status != null, Tourist::getStatus, status)
@@ -110,12 +109,11 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
         }
         checkScenicScope(exist);
 
-        // 白名单式更新：只接受这三个后台确实需要维护的字段。
-        // 若直接 updateById(tourist)，前端可以伪造积分、会员等级、实名状态甚至手机号。
+        // 白名单式更新：只接受这两个后台确实需要维护的字段。
+        // 若直接 updateById(tourist)，前端可以伪造实名状态甚至手机号。
         Tourist update = new Tourist();
         update.setId(tourist.getId());
         update.setRemark(tourist.getRemark());
-        update.setMemberLevel(tourist.getMemberLevel());
         update.setStatus(tourist.getStatus());
         updateById(update);
         log.info("编辑游客信息成功：id={}", tourist.getId());
@@ -178,7 +176,7 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
         // 只取统计需要的列，一次查询在内存里同时算出趋势和三类分布，
         // 避免每个图表各发一条 SQL（4 张图 = 4 次全表扫描）
         List<Tourist> tourists = this.list(Wrappers.<Tourist>lambdaQuery()
-                .select(Tourist::getCreateTime, Tourist::getMemberLevel, Tourist::getSource,
+                .select(Tourist::getCreateTime, Tourist::getSource,
                         Tourist::getGender, Tourist::getRealNameStatus)
                 .eq(scopeScenicId != null, Tourist::getRegisterScenicId, scopeScenicId)
                 .ge(Tourist::getCreateTime, start.atStartOfDay())
@@ -188,7 +186,6 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
         stat.setTotalCount((long) tourists.size());
 
         Map<String, Long> dailyCount = new LinkedHashMap<>();
-        Map<String, Long> levelCount = new LinkedHashMap<>();
         Map<String, Long> sourceCount = new LinkedHashMap<>();
         Map<String, Long> genderCount = new LinkedHashMap<>();
         long realNameCount = 0;
@@ -200,7 +197,6 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
             if (tourist.getCreateTime() != null) {
                 dailyCount.merge(tourist.getCreateTime().toLocalDate().format(DATE_FORMAT), 1L, Long::sum);
             }
-            levelCount.merge(labelMemberLevel(tourist.getMemberLevel()), 1L, Long::sum);
             sourceCount.merge(labelSource(tourist.getSource()), 1L, Long::sum);
             genderCount.merge(labelGender(tourist.getGender()), 1L, Long::sum);
         }
@@ -209,7 +205,6 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
         stat.setRealNameRate(rate(realNameCount, tourists.size()));
         // 趋势图必须逐日补零：缺口日期不能让折线直接跨过去，否则视觉上会「跳」
         stat.setTrend(buildTrend(dailyCount, start, end));
-        stat.setMemberLevelDist(toStatItems(levelCount));
         stat.setSourceDist(toStatItems(sourceCount));
         stat.setGenderDist(toStatItems(genderCount));
 
@@ -237,8 +232,6 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
         vo.setGender(tourist.getGender());
         vo.setAvatar(tourist.getAvatar());
         vo.setSource(tourist.getSource());
-        vo.setMemberLevel(tourist.getMemberLevel());
-        vo.setPoints(tourist.getPoints());
         vo.setRealNameStatus(tourist.getRealNameStatus());
         vo.setIsBlacklist(tourist.getIsBlacklist());
         vo.setBlacklistReason(tourist.getBlacklistReason());
@@ -285,18 +278,6 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
                 .divide(BigDecimal.valueOf(total), 2, RoundingMode.HALF_UP);
     }
 
-    private String labelMemberLevel(String level) {
-        if (!StringUtils.hasText(level)) {
-            return "普通会员";
-        }
-        return switch (level) {
-            case "SILVER" -> "白银会员";
-            case "GOLD" -> "黄金会员";
-            case "DIAMOND" -> "钻石会员";
-            default -> "普通会员";
-        };
-    }
-
     private String labelSource(String source) {
         if (!StringUtils.hasText(source)) {
             return "未知";
@@ -325,7 +306,7 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
      * ============================================================ */
 
     @Override
-    public List<TouristExportVO> listForExport(String keyword, Long scenicId, String memberLevel,
+    public List<TouristExportVO> listForExport(String keyword, Long scenicId,
                                                Integer isBlacklist, Integer realNameStatus, Integer status,
                                                int maxRows) {
         Long scopeScenicId = ScenicScope.resolve(scenicId);
@@ -334,7 +315,6 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
                 .and(StringUtils.hasText(keyword), w -> w
                         .like(Tourist::getRealName, keyword).or()
                         .like(Tourist::getTouristNo, keyword))
-                .eq(StringUtils.hasText(memberLevel), Tourist::getMemberLevel, memberLevel)
                 .eq(isBlacklist != null, Tourist::getIsBlacklist, isBlacklist)
                 .eq(realNameStatus != null, Tourist::getRealNameStatus, realNameStatus)
                 .eq(status != null, Tourist::getStatus, status)
@@ -361,8 +341,6 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
         vo.setIdCard(maskIdCard(tourist.getIdCard()));
         vo.setGenderLabel(labelGender(tourist.getGender()));
         vo.setSourceLabel(labelSource(tourist.getSource()));
-        vo.setMemberLevelLabel(labelMemberLevel(tourist.getMemberLevel()));
-        vo.setPoints(tourist.getPoints());
         vo.setRealNameStatusLabel(tourist.getRealNameStatus() != null && tourist.getRealNameStatus() == 1 ? "已实名" : "未实名");
         vo.setBlacklistLabel(tourist.getIsBlacklist() != null && tourist.getIsBlacklist() == 1 ? "是" : "否");
         vo.setBlacklistReason(tourist.getBlacklistReason());
@@ -438,8 +416,6 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
                     }
                     t.setGender(parseGender(row.getGender()));
                     t.setSource(normalizeSource(row.getSource()));
-                    t.setMemberLevel(normalizeMemberLevel(row.getMemberLevel()));
-                    t.setPoints(row.getPoints() == null ? 0 : row.getPoints());
                     t.setStatus(normalizeStatus(row.getStatus()));
                     t.setRemark(row.getRemark());
                     t.setIsBlacklist(0);
@@ -491,18 +467,6 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
         };
     }
 
-    private String normalizeMemberLevel(String raw) {
-        if (!StringUtils.hasText(raw)) return "NORMAL";
-        String s = raw.trim().toUpperCase();
-        return switch (s) {
-            case "NORMAL", "普通", "普通会员" -> "NORMAL";
-            case "SILVER", "白银", "白银会员" -> "SILVER";
-            case "GOLD", "黄金", "黄金会员" -> "GOLD";
-            case "DIAMOND", "钻石", "钻石会员" -> "DIAMOND";
-            default -> "NORMAL";
-        };
-    }
-
     private Integer normalizeStatus(String raw) {
         if (!StringUtils.hasText(raw)) return 1;
         String s = raw.trim();
@@ -511,10 +475,12 @@ public class TouristServiceImpl extends ServiceImpl<TouristMapper, Tourist> impl
         return 1;
     }
 
-    private static final Pattern TOURIST_NO_PATTERN = Pattern.compile("T\\d{8}");
+    /**
+     * 游客编号：统一走 CodeGenerator，形如 TR202510190001。
+     * 原先这里用「日期 + 6 位随机」，与注册流程的「日期 + 4 位流水」是两套规则，
+     * 同一个游客在不同入口建档会拿到风格完全不同的号。
+     */
     private String generateTouristNo() {
-        // 形如 T20250921 + 6 位随机。重复概率极低；如果并发极高可改为 Redis incr。
-        return "T" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
-                + (IdUtil.fastSimpleUUID().substring(0, 6).toUpperCase());
+        return codeGenerator.daily(CodeGenerator.PREFIX_TOURIST);
     }
 }

@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public interface ComplaintService {
 
     PageResult<ComplaintVO> pageQuery(Integer pageNum, Integer pageSize, String keyword, Long scenicId,
-                                      String type, String priority, String status, String sentiment,
+                                      String type, String status, String sentiment,
                                       LocalDate startDate, LocalDate endDate);
 
     /** 工单详情，含会话式回复记录 */

@@ -52,12 +52,6 @@ public class ComplaintVO implements Serializable {
     @Schema(description = "类型中文")
     private String typeText;
 
-    @Schema(description = "优先级码：NORMAL/URGENT")
-    private String priority;
-
-    @Schema(description = "优先级中文")
-    private String priorityText;
-
     @Schema(description = "状态码：PENDING/PROCESSING/CLOSED")
     private String status;
 

@@ -139,9 +139,8 @@ public class AppTouristServiceImpl implements AppTouristService {
         vo.setGender(tourist.getGender());
         vo.setAvatar(tourist.getAvatar());
         vo.setSource(tourist.getSource());
-        vo.setMemberLevel(tourist.getMemberLevel());
-        vo.setPoints(tourist.getPoints());
         vo.setRealNameStatus(tourist.getRealNameStatus());
+        vo.setFaceStatus(tourist.getFaceStatus());
         vo.setIsBlacklist(tourist.getIsBlacklist());
         vo.setBlacklistReason(tourist.getBlacklistReason());
         vo.setBlacklistTime(tourist.getBlacklistTime());
