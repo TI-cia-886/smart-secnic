@@ -225,7 +225,7 @@ public class TicketTypeServiceImpl extends ServiceImpl<TicketTypeMapper, TicketT
                 .eq(StringUtils.hasText(ticketType), TicketType::getTicketType, ticketType)
                 .eq(StringUtils.hasText(ticketName), TicketType::getTicketName, ticketName)
                 .ne(excludeId != null, TicketType::getId, excludeId));
-        if (count != null && count > 0) {
+        if (count > 0) {
             throw new BusinessException("同景区下已存在同名同类型的票种：" + ticketName);
         }
     }

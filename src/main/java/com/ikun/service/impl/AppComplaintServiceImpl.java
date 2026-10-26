@@ -32,9 +32,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -49,8 +47,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AppComplaintServiceImpl implements AppComplaintService {
-
-    private static final DateTimeFormatter NO_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private static final String STATUS_PENDING = "PENDING";
     private static final String STATUS_PROCESSING = "PROCESSING";

@@ -32,12 +32,12 @@ public class TouristExportVO implements Serializable {
 
     @ExcelProperty("手机号")
     @ColumnWidth(16)
-    /** 已脱敏：138****1234 */
+    // 已脱敏：138****1234
     private String phone;
 
     @ExcelProperty("证件号码")
     @ColumnWidth(22)
-    /** 已脱敏：保留前 6 + 后 4 */
+    // 已脱敏：保留前 6 + 后 4
     private String idCard;
 
     @ExcelProperty("性别")

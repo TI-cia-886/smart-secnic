@@ -1,7 +1,6 @@
 package com.ikun.vo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -43,17 +42,17 @@ public class TouristImportVO implements Serializable {
 
     @ExcelProperty(value = "性别", index = 3)
     @ColumnWidth(8)
-    /** 允许写入：男 / 女 / 1 / 2 ；导入时统一规范化为 1 / 2 / 0 */
+    // 允许写入：男 / 女 / 1 / 2 ；导入时统一规范化为 1 / 2 / 0
     private String gender;
 
     @ExcelProperty(value = "注册来源", index = 4)
     @ColumnWidth(14)
-    /** MINI_PROGRAM / OTA / WINDOW */
+    // MINI_PROGRAM / OTA / WINDOW
     private String source;
 
     @ExcelProperty(value = "状态", index = 5)
     @ColumnWidth(8)
-    /** 正常 / 禁用 */
+    // 正常 / 禁用
     private String status;
 
     @ExcelProperty(value = "备注", index = 6)

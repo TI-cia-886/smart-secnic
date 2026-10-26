@@ -269,12 +269,13 @@ public class PassengerFlowServiceImpl implements PassengerFlowService {
 
         // 报表涉及当天且已过统一离园时刻时，先落库闭园行，保证「离园/在园」与概览口径一致
         if (end.equals(LocalDate.now()) && LocalTime.now().getHour() >= LEAVE_HOUR) {
-            int todayEnter = nz(passengerFlowMapper.selectList(Wrappers.<PassengerFlow>lambdaQuery()
+            // .sum() 已返回基本类型 int（空流为 0），外面再包一层 nz() 是多余的判空
+            int todayEnter = passengerFlowMapper.selectList(Wrappers.<PassengerFlow>lambdaQuery()
                     .eq(PassengerFlow::getScenicId, scenicId)
                     .eq(PassengerFlow::getStatDate, end))
                     .stream()
                     .mapToInt(f -> nz(f.getEnterCount()))
-                    .sum());
+                    .sum();
             closeDayAfterLeave(scenicId, todayEnter, area == null || area.getDailyCapacity() == null ? 0 : area.getDailyCapacity());
         }
 

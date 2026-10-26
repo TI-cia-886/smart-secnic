@@ -40,7 +40,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -494,7 +493,8 @@ public class AiServiceImpl implements AiService {
         intersection.retainAll(b);
         Set<Character> union = new HashSet<>(a);
         union.addAll(b);
-        return union.isEmpty() ? 0D : (double) intersection.size() / union.size();
+        // 上面已保证 a、b 非空，并集必然非空，无需再判空
+        return (double) intersection.size() / union.size();
     }
 
     private void validateKnowledge(AiKnowledge knowledge) {

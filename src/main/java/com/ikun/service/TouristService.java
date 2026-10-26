@@ -5,7 +5,6 @@ import com.ikun.dto.TouristBlacklistDTO;
 import com.ikun.dto.TouristImportResultVO;
 import com.ikun.entity.Tourist;
 import com.ikun.vo.TouristExportVO;
-import com.ikun.vo.TouristImportVO;
 import com.ikun.vo.TouristStatVO;
 import com.ikun.vo.TouristVO;
 import org.springframework.web.multipart.MultipartFile;

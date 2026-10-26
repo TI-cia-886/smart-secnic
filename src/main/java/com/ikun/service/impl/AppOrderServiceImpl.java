@@ -34,7 +34,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +54,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AppOrderServiceImpl implements AppOrderService {
-
-    private static final DateTimeFormatter ORDER_NO_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private static final String STATUS_PENDING_PAY = "PENDING_PAY";
     private static final String STATUS_PAID = "PAID";

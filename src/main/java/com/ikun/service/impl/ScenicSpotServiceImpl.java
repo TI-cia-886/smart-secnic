@@ -200,7 +200,7 @@ public class ScenicSpotServiceImpl extends ServiceImpl<ScenicSpotMapper, ScenicS
                 .eq(ScenicSpot::getSpotCode, spotCode)
                 .eq(ScenicSpot::getScenicId, scenicId)
                 .ne(excludeId != null, ScenicSpot::getId, excludeId));
-        if (count != null && count > 0) {
+        if (count > 0) {
             throw new BusinessException("景点编号已存在：" + spotCode);
         }
     }

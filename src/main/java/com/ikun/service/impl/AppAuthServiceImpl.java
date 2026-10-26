@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -38,8 +36,6 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 public class AppAuthServiceImpl implements AppAuthService {
-
-    private static final DateTimeFormatter NO_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private final TouristMapper touristMapper;
     private final JwtUtil jwtUtil;
